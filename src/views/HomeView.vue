@@ -1,32 +1,23 @@
 <script setup lang="ts">
-import BasicCard from '@/components/BasicCard.vue';
+import { type Card } from '@/components/BasicCard/types';
 import NoCard from '@/components/NoCard.vue';
+import StandardCard from '@/components/StandardCard.vue';
 import { computed, onMounted, ref } from 'vue';
-
-const SUIT_ASCII = {
-  diamond: '♦',
-  heart: '♥',
-  club: '♣',
-  spade: '♠',
-};
-
-type Suit = keyof typeof SUIT_ASCII;
-type Card = { id: string; value: number[] | number; text: string; suit: Suit };
 
 const cards = [
   { id: 'a', text: 'A', value: [1, 11] },
-  { id: '2', text: '2', value: 2 },
-  { id: '3', text: '3', value: 3 },
-  { id: '4', text: '4', value: 4 },
-  { id: '5', text: '5', value: 5 },
-  { id: '6', text: '6', value: 6 },
-  { id: '7', text: '7', value: 7 },
-  { id: '8', text: '8', value: 8 },
-  { id: '9', text: '9', value: 9 },
-  { id: '10', text: '10', value: 10 },
-  { id: 'j', text: 'J', value: 10 },
-  { id: 'q', text: 'Q', value: 10 },
-  { id: 'k', text: 'K', value: 10 },
+  // { id: '2', text: '2', value: 2 },
+  // { id: '3', text: '3', value: 3 },
+  // { id: '4', text: '4', value: 4 },
+  // { id: '5', text: '5', value: 5 },
+  // { id: '6', text: '6', value: 6 },
+  // { id: '7', text: '7', value: 7 },
+  // { id: '8', text: '8', value: 8 },
+  // { id: '9', text: '9', value: 9 },
+  // { id: '10', text: '10', value: 10 },
+  // { id: 'j', text: 'J', value: 10 },
+  // { id: 'q', text: 'Q', value: 10 },
+  // { id: 'k', text: 'K', value: 10 },
 ];
 const cardDeck = ref<Card[]>([]);
 const discardPile = ref<Card[]>([]);
@@ -89,77 +80,37 @@ onMounted(() => {
     <div>
       <div class="flex justify-center gap-2">
         <div class="justify-center flex mb-8">
-          <div v-if="cardDeck.length" class="relative w-24 h-40">
-            <TransitionGroup name="card-deck">
-              <BasicCard
-                v-for="card in cardDeck"
-                :key="card.id"
-                class="absolute"
-                @click="dealCard"
-              />
-            </TransitionGroup>
-          </div>
-          <NoCard v-else @click="fillDeck"> No cards remaining </NoCard>
+          <TransitionGroup name="card-deck" class="relative w-24 h-40" tag="div">
+            <NoCard v-if="!cardDeck.length" class="absolute empty" @click="fillDeck">
+              No cards remaining
+            </NoCard>
+            <StandardCard
+              v-for="card in cardDeck"
+              v-else
+              :key="card.id"
+              :card="card"
+              class="absolute"
+              @click="dealCard"
+            />
+          </TransitionGroup>
         </div>
 
         <div>
-          <BasicCard v-if="discardPile.length" is-faded is-face-up>
-            <div
-              class="flex flex-col justify-between h-full w-full p-1"
-              :class="{ 'text-red-500': ['heart', 'diamond'].includes(topOfDiscardPile.suit) }"
-            >
-              <div class="text-left">
-                {{ topOfDiscardPile.text }}
-                <br />
-                {{ SUIT_ASCII[topOfDiscardPile.suit] }}
-              </div>
-
-              {{ SUIT_ASCII[topOfDiscardPile.suit] }}
-
-              <div class="text-left rotate-180">
-                {{ topOfDiscardPile.text }}
-                <br />
-                {{ SUIT_ASCII[topOfDiscardPile.suit] }}
-              </div>
-            </div>
-          </BasicCard>
+          <StandardCard v-if="discardPile.length" :card="topOfDiscardPile" is-face-up />
           <NoCard v-else />
         </div>
       </div>
 
-      <div v-if="dealtCards.length" class="flex justify-center gap-2">
-        <TransitionGroup name="card-hand">
-          <BasicCard
-            v-for="(card, index) in dealtCards"
-            :key="card.id"
-            :value="card.value"
-            is-face-up
-            @click="discardCardFromHand(index)"
-          >
-            <div
-              class="flex flex-col justify-between h-full w-full p-1"
-              :class="{ 'text-red-500': ['heart', 'diamond'].includes(card.suit) }"
-            >
-              <div class="text-left">
-                {{ card.text }}
-                <br />
-                {{ SUIT_ASCII[card.suit] }}
-              </div>
-
-              {{ SUIT_ASCII[card.suit] }}
-
-              <div class="text-left rotate-180">
-                {{ card.text }}
-                <br />
-                {{ SUIT_ASCII[card.suit] }}
-              </div>
-            </div>
-          </BasicCard>
-        </TransitionGroup>
-      </div>
-      <div v-else class="flex justify-center gap-2">
-        <NoCard />
-      </div>
+      <TransitionGroup class="flex justify-center gap-2 h-40" name="card-hand" tag="div">
+        <NoCard v-if="!dealtCards.length" class="absolute empty" />
+        <StandardCard
+          v-for="(card, index) in dealtCards"
+          :key="card.id"
+          :card="card"
+          is-face-up
+          @click="discardCardFromHand(index)"
+        />
+      </TransitionGroup>
     </div>
   </main>
 </template>
@@ -174,11 +125,30 @@ onMounted(() => {
   transition: all 0.5s ease;
 }
 
-.card-deck-leave-to {
-  transform: translateY(200px) rotate(-10deg);
+.card-deck-enter-from {
+  opacity: 0;
+  transform: translateX(80px) rotate(-30deg);
 }
 
+.card-deck-leave-to {
+  opacity: 0;
+  transform: translateX(-100vw) rotate(-30deg);
+}
+
+.card-hand-enter-from {
+  opacity: 0;
+  transform: translateX(100vw) rotate(-30deg);
+}
 .card-hand-leave-to {
-  transform: translateY(-200px) rotate(-10deg);
+  opacity: 0;
+  transform: translateY(-200px) rotate(360deg);
+}
+
+.card-deck-enter-from.empty,
+.card-deck-leave-to.empty,
+.card-hand-enter-from.empty,
+.card-hand-leave-to.empty {
+  opacity: 0;
+  transform: none;
 }
 </style>
