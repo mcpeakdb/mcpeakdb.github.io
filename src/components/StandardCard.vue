@@ -7,7 +7,16 @@ import CornerNumber from './StandardCard/CornerNumber.vue';
 defineProps({
   card: {
     type: Object as () => Card,
-    default: () => {},
+    default: () => {
+      return {
+        id: 0,
+        text: '',
+        value: 0,
+        suit: 'heart',
+      };
+    },
+
+    required: false,
   },
   isFaceUp: {
     type: Boolean,
@@ -41,7 +50,7 @@ function isCard(Card: Card, x = 0): boolean {
 </script>
 
 <template>
-  <BasicCard :key="card.id" :value="card.value" :is-face-up="isFaceUp">
+  <BasicCard :value="card.value" :is-face-up="isFaceUp">
     <div
       class="flex justify-center align-center h-full w-full p-1 relative"
       :class="{ 'text-red-500': ['heart', 'diamond'].includes(card.suit) }"
