@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { type Card } from '@/components/BasicCard/types';
+import { type StandardCard as Card } from '@/components/StandardCard/types';
 import NoCard from '@/components/NoCard.vue';
 import StandardCard from '@/components/StandardCard.vue';
 import { computed, onMounted, ref } from 'vue';
 
 const cards = [
   { id: 'a', text: 'A', value: [1, 11] },
-  // { id: '2', text: '2', value: 2 },
-  // { id: '3', text: '3', value: 3 },
-  // { id: '4', text: '4', value: 4 },
-  // { id: '5', text: '5', value: 5 },
-  // { id: '6', text: '6', value: 6 },
-  // { id: '7', text: '7', value: 7 },
-  // { id: '8', text: '8', value: 8 },
-  // { id: '9', text: '9', value: 9 },
-  // { id: '10', text: '10', value: 10 },
-  // { id: 'j', text: 'J', value: 10 },
-  // { id: 'q', text: 'Q', value: 10 },
-  // { id: 'k', text: 'K', value: 10 },
+  { id: '2', text: '2', value: 2 },
+  { id: '3', text: '3', value: 3 },
+  { id: '4', text: '4', value: 4 },
+  { id: '5', text: '5', value: 5 },
+  { id: '6', text: '6', value: 6 },
+  { id: '7', text: '7', value: 7 },
+  { id: '8', text: '8', value: 8 },
+  { id: '9', text: '9', value: 9 },
+  { id: '10', text: '10', value: 10 },
+  { id: 'j', text: 'J', value: 10 },
+  { id: 'q', text: 'Q', value: 10 },
+  { id: 'k', text: 'K', value: 10 },
 ];
 const cardDeck = ref<Card[]>([]);
 const discardPile = ref<Card[]>([]);
@@ -80,7 +80,7 @@ onMounted(() => {
     <div>
       <div class="flex justify-center gap-2">
         <div class="justify-center flex mb-8">
-          <TransitionGroup name="card-deck" class="relative w-24 h-40" tag="div">
+          <TransitionGroup name="card-deck" class="relative w-36 h-60" tag="div">
             <NoCard v-if="!cardDeck.length" class="absolute empty" @click="fillDeck">
               No cards remaining
             </NoCard>
@@ -101,7 +101,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <TransitionGroup class="flex justify-center gap-2 h-40" name="card-hand" tag="div">
+      <TransitionGroup class="flex justify-center gap-2 h-60" name="card-hand" tag="div">
         <NoCard v-if="!dealtCards.length" class="absolute empty" />
         <StandardCard
           v-for="(card, index) in dealtCards"
@@ -123,6 +123,7 @@ onMounted(() => {
 .card-hand-leave-active,
 .card-hand-move {
   transition: all 0.5s ease;
+  pointer-events: none;
 }
 
 .card-deck-enter-from {
