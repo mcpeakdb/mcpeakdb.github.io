@@ -2,18 +2,17 @@
 import useStandardDeck from '@/composables/useStandardDeck';
 import StandardCard from '../StandardCard.vue';
 
-const { playerHand, discardCardFromHand } = useStandardDeck;
+const { playerHand } = useStandardDeck;
 </script>
 
 <template>
-  <TransitionGroup class="flex gap-2 w-[80vw] flex-wrap" name="card-hand" tag="div">
+  <TransitionGroup class="flex justify-center gap-2 w-[80vw] flex-wrap" name="card-hand" tag="div">
     <StandardCard
-      v-for="(card, index) in playerHand"
+      v-for="card in playerHand"
       :key="'hand-' + card.id"
       :card="card"
       is-face-up
       class="cursor-n-resize"
-      @click="discardCardFromHand(index)"
     />
   </TransitionGroup>
 </template>

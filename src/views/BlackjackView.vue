@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import useStandardDeck from '@/composables/useStandardDeck';
 import StandardCardDeck from '@/components/StandardCard/StandardCardDeck.vue';
@@ -13,6 +13,9 @@ const isDealt = ref(false);
 function dealHand(): void {
   isComputerThinking.value = true;
 
+  playerHand.value = [];
+  computerHand.value = [];
+
   dealCard();
   dealComputerCard();
   dealCard();
@@ -23,39 +26,40 @@ function dealHand(): void {
 }
 
 const isComputerThinking = ref(false);
-async function endTurn(): Promise<void> {
-  isComputerThinking.value = true;
+const computerHandTotal = computed(() => {
+  let total = 0;
 
-  let computerHandTotal = 0;
   computerHand.value.forEach((card) => {
     if (typeof card.value === 'number') {
-      return (computerHandTotal += card.value);
+      return (total += card.value);
     }
+
+    if (total + card.value[1] > 21) {
+      return card.value[0];
+    }
+
     return card.value[1];
   });
 
-  while (computerHandTotal < 16) {
-    computerHandTotal = 0;
+  return total;
+});
 
+async function endTurn(): Promise<void> {
+  isComputerThinking.value = true;
+
+  while (computerHandTotal.value < 16) {
     dealComputerCard();
 
-    computerHand.value.forEach((card) => {
-      if (typeof card.value === 'number') {
-        return (computerHandTotal += card.value);
-      }
-
-      if (computerHandTotal + card.value[1] > 21) {
-        return card.value[0];
-      }
-
-      return card.value[1];
-    });
-    await setTimeout(() => 2000);
-    return;
+    await new Promise((resolve) =>
+      setTimeout(() => {
+        resolve(undefined);
+      }, 500),
+    );
   }
 
-  alert(`Computer has ${computerHandTotal}`);
+  alert(`Computer has ${computerHandTotal.value}`);
   isComputerThinking.value = false;
+  isDealt.value = false;
 }
 
 onMounted(() => {
