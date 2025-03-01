@@ -80,7 +80,7 @@ onMounted(() => {
     <div>
       <div class="flex justify-center gap-2">
         <div class="justify-center flex mb-8">
-          <TransitionGroup name="card-deck" class="relative w-36 h-60" tag="div">
+          <TransitionGroup name="card-deck" class="relative w-24 h-40" tag="div">
             <NoCard v-if="!cardDeck.length" class="absolute empty" @click="fillDeck">
               No cards remaining
             </NoCard>
@@ -101,7 +101,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <TransitionGroup class="flex justify-center gap-2 h-60" name="card-hand" tag="div">
+      <TransitionGroup class="flex justify-center gap-2 h-40" name="card-hand" tag="div">
         <NoCard v-if="!dealtCards.length" class="absolute empty" />
         <StandardCard
           v-for="(card, index) in dealtCards"
