@@ -35,8 +35,6 @@ async function endTurn(): Promise<void> {
   });
 
   while (computerHandTotal < 16) {
-    console.log(computerHand.value);
-
     computerHandTotal = 0;
 
     dealComputerCard();
@@ -45,6 +43,11 @@ async function endTurn(): Promise<void> {
       if (typeof card.value === 'number') {
         return (computerHandTotal += card.value);
       }
+
+      if (computerHandTotal + card.value[1] > 21) {
+        return card.value[0];
+      }
+
       return card.value[1];
     });
     await setTimeout(() => 2000);
