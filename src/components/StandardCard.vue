@@ -24,7 +24,7 @@ function isAce(Card: Card): boolean {
 
 function shouldRotateSuit(Card: Card): boolean {
   if (typeof Card.value === 'number') {
-    return Card.value < 6;
+    return Card.value < 6 || Card.value === 9;
   }
 
   return false;
