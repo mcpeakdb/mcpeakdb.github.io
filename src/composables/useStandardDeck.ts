@@ -17,6 +17,14 @@ const cards = [
   { id: 'k', text: 'K', value: 10 },
 ];
 
+async function sleep(ms = 500): Promise<void> {
+  return await new Promise((resolve) =>
+    setTimeout(() => {
+      resolve(undefined);
+    }, ms),
+  );
+}
+
 function buildDeck(): void {
   for (let i = 0; i < cards.length; i++) {
     for (let j = 0; j < 4; j++) {
@@ -95,4 +103,5 @@ export default {
   discardCardFromHand,
   shuffle,
   fillDeck,
+  sleep,
 };
