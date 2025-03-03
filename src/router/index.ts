@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
-import BlackjackView from '../views/BlackjackView.vue';
+import HomeView from '@/views/HomeView.vue';
+import BlackjackView from '@/views/BlackjackView.vue';
 
 const router = createRouter({
   history: createWebHashHistory(),
