@@ -5,59 +5,139 @@ import useStandardDeck from '@/composables/useStandardDeck';
 import StandardCardDeck from '@/components/StandardCard/StandardCardDeck.vue';
 import StandardCardDiscard from '@/components/StandardCard/StandardCardDiscard.vue';
 import StandardCardHand from '@/components/StandardCard/StandardCardHand.vue';
+import type { StandardCard } from '@/components/StandardCard/types';
+
+async function sleep(ms = 500): Promise<void> {
+  return await new Promise((resolve) =>
+    setTimeout(() => {
+      resolve(undefined);
+    }, ms),
+  );
+}
 
 const { playerHand, computerHand, buildDeck, dealCard, dealComputerCard } = useStandardDeck;
 
 const isDealt = ref(false);
 
-function dealHand(): void {
+async function dealHand(): Promise<void> {
+  isGameOver.value = false;
   isComputerThinking.value = true;
 
   playerHand.value = [];
   computerHand.value = [];
 
   dealCard();
+  await sleep();
   dealComputerCard();
+  await sleep();
   dealCard();
+  await sleep();
   dealComputerCard();
+
+  if (computerHandTotal.value === 21) {
+    handleEndGame();
+    showResult(false);
+    return;
+  }
 
   isComputerThinking.value = false;
   isDealt.value = true;
 }
 
-const isComputerThinking = ref(false);
-const computerHandTotal = computed(() => {
-  let total = 0;
+function hit(): void {
+  dealCard();
 
-  computerHand.value.forEach((card) => {
-    if (typeof card.value === 'number') {
-      return (total += card.value);
-    }
+  if (playerHandTotal.value > 21) {
+    handleEndGame();
+    showResult(false);
+    return;
+  }
+}
 
-    if (total + card.value[1] > 21) {
-      return card.value[0];
-    }
-
-    return card.value[1];
-  });
-
-  return total;
+const playerHandTotal = computed(() => {
+  return getTotal(playerHand.value);
 });
 
+const isComputerThinking = ref(false);
+const computerHandTotal = computed(() => {
+  return getTotal(computerHand.value);
+});
+
+function getTotal(hand: StandardCard[]): number {
+  let total = 0;
+  let totalAces = 0;
+
+  hand
+    .toSorted((a, b) => {
+      if (typeof a.value === 'number') {
+        return -1;
+      } else if (typeof b.value === 'number') {
+        return 1;
+      } else {
+        return 1;
+      }
+    })
+    .forEach((card) => {
+      if (typeof card.value === 'number') {
+        total += card.value;
+      } else {
+        totalAces += 1;
+      }
+    });
+
+  total += totalAces;
+
+  while (total < 21 && total + 10 <= 21) {
+    if (totalAces) {
+      total += 10;
+      totalAces -= 1;
+    }
+  }
+
+  return total;
+}
+
+const isGameOver = ref(false);
 async function endTurn(): Promise<void> {
   isComputerThinking.value = true;
+
+  await sleep();
 
   while (computerHandTotal.value < 16) {
     dealComputerCard();
 
-    await new Promise((resolve) =>
-      setTimeout(() => {
-        resolve(undefined);
-      }, 500),
-    );
+    await sleep();
   }
 
-  alert(`Computer has ${computerHandTotal.value}`);
+  handleEndGame();
+
+  if (computerHandTotal.value > 21) {
+    showResult(true);
+  } else if (computerHandTotal.value === playerHandTotal.value) {
+    if (computerHand.value.length >= playerHand.value.length) {
+      showResult(false);
+    } else {
+      showResult(true);
+    }
+  } else if (computerHandTotal.value === 21 || computerHandTotal.value > playerHandTotal.value) {
+    showResult(false);
+  } else {
+    showResult(true);
+  }
+}
+
+function showResult(didWin: boolean): void {
+  setTimeout(() => {
+    if (didWin) {
+      alert('You wins');
+    } else {
+      alert('Computer wins!');
+    }
+  }, 500);
+}
+
+function handleEndGame(): void {
+  isGameOver.value = true;
   isComputerThinking.value = false;
   isDealt.value = false;
 }
@@ -68,8 +148,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="w-screen h-screen" :class="{ 'pointer-events-none': isComputerThinking }">
-    <div class="w-screen h-[50vh] flex justify-center items-end mb-2">
+  <main
+    class="w-screen h-screen bg-green-900"
+    :class="{ 'pointer-events-none': isComputerThinking }"
+  >
+    <div class="w-screen h-[50vh] flex flex-col items-center justify-end mb-2">
+      <StandardCardHand :hand="computerHand" :visible="isGameOver ? -1 : 1" class="mb-2" />
+
       <div class="flex justify-center gap-2">
         <StandardCardDeck />
 
@@ -80,20 +165,20 @@ onMounted(() => {
     <div class="w-full flex justify-center">
       <button
         v-if="!isDealt"
-        class="cursor-pointer focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+        class="cursor-pointer focus:outline-none text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
         @click="dealHand"
       >
         Deal
       </button>
       <div v-else>
         <button
-          class="cursor-pointer focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-          @click="dealCard"
+          class="cursor-pointer focus:outline-none text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
+          @click="hit"
         >
           Hit
         </button>
         <button
-          class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+          class="cursor-pointer focus:outline-none text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
           :disabled="playerHand.length < 2"
           :class="{
             'opacity-50 cursor-not-allowed': playerHand.length < 2,
@@ -107,7 +192,7 @@ onMounted(() => {
     </div>
 
     <div class="w-screen flex justify-center items-start">
-      <StandardCardHand />
+      <StandardCardHand :hand="playerHand" />
     </div>
   </main>
 </template>

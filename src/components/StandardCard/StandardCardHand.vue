@@ -1,18 +1,32 @@
 <script lang="ts" setup>
-import useStandardDeck from '@/composables/useStandardDeck';
 import StandardCard from '../StandardCard.vue';
+import type { StandardCard as Card } from './types';
 
-const { playerHand } = useStandardDeck;
+defineProps({
+  hand: {
+    type: Array as () => Card[],
+    default: () => [],
+  },
+  visible: {
+    type: Number,
+    default: -1,
+  },
+});
 </script>
 
 <template>
-  <TransitionGroup class="flex justify-center gap-2 w-[80vw] flex-wrap" name="card-hand" tag="div">
+  <TransitionGroup
+    class="flex ms-20 justify-center gap-2 w-[80vw] flex-wrap"
+    name="card-hand"
+    tag="div"
+  >
     <StandardCard
-      v-for="card in playerHand"
+      v-for="(card, index) in hand"
       :key="'hand-' + card.id"
       :card="card"
-      is-face-up
-      class="cursor-n-resize"
+      :is-face-up="visible === -1 || index <= visible - 1"
+      class="cursor-n-resize -ms-20"
+      :style="`z-index: ${index}`"
     />
   </TransitionGroup>
 </template>
