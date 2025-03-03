@@ -6,6 +6,7 @@ import StandardCardDeck from '@/components/StandardCard/StandardCardDeck.vue';
 import StandardCardDiscard from '@/components/StandardCard/StandardCardDiscard.vue';
 import StandardCardHand from '@/components/StandardCard/StandardCardHand.vue';
 import type { StandardCard } from '@/components/StandardCard/types';
+import ActionButton from '@/components/Layout/ActionButton.vue';
 
 async function sleep(ms = 500): Promise<void> {
   return await new Promise((resolve) =>
@@ -163,23 +164,10 @@ onMounted(() => {
     </div>
 
     <div class="w-full flex justify-center">
-      <button
-        v-if="!isDealt"
-        class="cursor-pointer focus:outline-none text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
-        @click="dealHand"
-      >
-        Deal
-      </button>
+      <ActionButton v-if="!isDealt" @click="dealHand"> Deal </ActionButton>
       <div v-else>
-        <button
-          class="cursor-pointer focus:outline-none text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
-          @click="hit"
-        >
-          Hit
-        </button>
-        <button
-          class="cursor-pointer focus:outline-none text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
-          :disabled="playerHand.length < 2"
+        <ActionButton @click="hit"> Hit </ActionButton>
+        <ActionButton
           :class="{
             'opacity-50 cursor-not-allowed': playerHand.length < 2,
             'cursor-pointer': playerHand.length >= 2,
@@ -187,7 +175,7 @@ onMounted(() => {
           @click="endTurn"
         >
           Stay
-        </button>
+        </ActionButton>
       </div>
     </div>
 
