@@ -129,7 +129,7 @@ async function endTurn(): Promise<void> {
 function showResult(didWin: boolean): void {
   setTimeout(() => {
     if (didWin) {
-      alert('You wins');
+      alert('You win!');
     } else {
       alert('Computer wins!');
     }
