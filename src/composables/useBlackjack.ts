@@ -76,7 +76,9 @@ function getTotal(hand: StandardCard[]): number {
   total += totalAces;
 
   while (totalAces > 0 && total < 21 && total + 10 <= 21) {
-    total += 10;
+    if (total < 21 && total + 10 <= 21) {
+      total += 10;
+    }
     totalAces -= 1;
   }
 
