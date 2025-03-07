@@ -2,7 +2,8 @@ import { computed, ref } from 'vue';
 import useStandardDeck from './useStandardDeck';
 import type { StandardCard } from '@/components/StandardCard/types';
 
-const { playerHand, computerHand, buildDeck, dealCard, dealComputerCard, sleep } = useStandardDeck;
+const { playerHand, computerHand, buildDeck, dealCard, dealComputerCard, sleep, fillDeck } =
+  useStandardDeck;
 
 const isDealt = ref(false);
 
@@ -74,11 +75,9 @@ function getTotal(hand: StandardCard[]): number {
 
   total += totalAces;
 
-  while (total < 21 && total + 10 < 20) {
-    if (totalAces) {
-      total += 10;
-      totalAces -= 1;
-    }
+  while (totalAces > 0 && total < 21 && total + 10 <= 21) {
+    total += 10;
+    totalAces -= 1;
   }
 
   return total;
@@ -90,7 +89,7 @@ async function endTurn(): Promise<void> {
 
   await sleep();
 
-  while (computerHandTotal.value < 16) {
+  while (computerHandTotal.value < 17) {
     dealComputerCard();
 
     await sleep();
@@ -127,6 +126,7 @@ function handleEndGame(): void {
   isGameOver.value = true;
   isComputerThinking.value = false;
   isDealt.value = false;
+  fillDeck();
 }
 
 export default {

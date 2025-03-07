@@ -3,7 +3,6 @@ import { onMounted } from 'vue';
 
 import useBlackjack from '@/composables/useBlackjack';
 import StandardCardDeck from '@/components/StandardCard/StandardCardDeck.vue';
-import StandardCardDiscard from '@/components/StandardCard/StandardCardDiscard.vue';
 import StandardCardHand from '@/components/StandardCard/StandardCardHand.vue';
 import ActionButton from '@/components/Layout/ActionButton.vue';
 
@@ -34,8 +33,6 @@ onMounted(() => {
 
       <div class="flex justify-center gap-2">
         <StandardCardDeck />
-
-        <StandardCardDiscard />
       </div>
     </div>
 

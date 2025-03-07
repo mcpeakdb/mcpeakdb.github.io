@@ -85,7 +85,7 @@ const topOfDiscardPile = computed(() => {
 });
 
 function fillDeck(): void {
-  cardDeck.value = [...discardPile.value];
+  cardDeck.value = [...cardDeck.value, ...discardPile.value];
   discardPile.value = [];
   shuffle();
 }
