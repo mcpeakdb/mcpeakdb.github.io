@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 
 import useBlackjack from '@/composables/useBlackjack';
 import StandardCardDeck from '@/components/StandardCard/StandardCardDeck.vue';
@@ -16,16 +16,21 @@ const {
   dealHand,
   hit,
   endTurn,
+  reset,
 } = useBlackjack;
 
 onMounted(() => {
   buildDeck();
 });
+
+onUnmounted(() => {
+  reset();
+});
 </script>
 
 <template>
   <main
-    class="w-screen h-screen bg-green-900"
+    class="w-screen h-screen bg-green-900 overflow-x-hidden"
     :class="{ 'pointer-events-none': isComputerThinking }"
   >
     <div class="w-screen h-[50vh] flex flex-col items-center justify-end mb-2">
@@ -36,9 +41,13 @@ onMounted(() => {
       </div>
     </div>
 
+    <div class="w-screen flex justify-center items-start mb-2">
+      <StandardCardHand :hand="playerHand" />
+    </div>
+
     <div class="w-full flex justify-center">
-      <ActionButton v-if="!isDealt" @click="dealHand"> Deal </ActionButton>
-      <div v-else>
+      <ActionButton v-if="!isDealt && !isComputerThinking" @click="dealHand"> Deal </ActionButton>
+      <div v-else-if="!isComputerThinking" class="flex gap-2">
         <ActionButton @click="hit"> Hit </ActionButton>
         <ActionButton
           :class="{
@@ -50,10 +59,6 @@ onMounted(() => {
           Stay
         </ActionButton>
       </div>
-    </div>
-
-    <div class="w-screen flex justify-center items-start">
-      <StandardCardHand :hand="playerHand" />
     </div>
   </main>
 </template>

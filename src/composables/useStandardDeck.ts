@@ -38,7 +38,7 @@ function buildDeck(): void {
     }
   }
 
-  shuffle();
+  fillDeck();
 }
 
 function shuffle() {
@@ -91,7 +91,10 @@ function fillDeck(): void {
     ...playerHand.value,
     ...computerHand.value,
   ];
+
   discardPile.value = [];
+  playerHand.value = [];
+  computerHand.value = [];
   shuffle();
 }
 

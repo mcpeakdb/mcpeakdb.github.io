@@ -7,12 +7,18 @@ const { playerHand, computerHand, buildDeck, dealCard, dealComputerCard, sleep, 
 
 const isDealt = ref(false);
 
+function reset(): void {
+  fillDeck();
+  isGameOver.value = true;
+  isDealt.value = false;
+  isComputerThinking.value = false;
+}
+
 async function dealHand(): Promise<void> {
   isGameOver.value = false;
   isComputerThinking.value = true;
 
-  playerHand.value = [];
-  computerHand.value = [];
+  fillDeck();
 
   dealCard();
   await sleep();
@@ -128,7 +134,6 @@ function handleEndGame(): void {
   isGameOver.value = true;
   isComputerThinking.value = false;
   isDealt.value = false;
-  fillDeck();
 }
 
 export default {
@@ -141,4 +146,5 @@ export default {
   dealHand,
   hit,
   endTurn,
+  reset,
 };

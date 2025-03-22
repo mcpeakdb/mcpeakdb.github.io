@@ -59,7 +59,7 @@ function isCard(Card: Card, x = 0): boolean {
 
       <span
         v-if="isFaceCard(card)"
-        class="flex flex-col justify-center items-center h-full w-full flex-wrap gap-1 text-4xl"
+        class="flex flex-col justify-center items-center h-full w-full flex-wrap gap-1 text-7xl text-jacquard-24"
       >
         {{ card.text }}
       </span>
@@ -170,3 +170,9 @@ function isCard(Card: Card, x = 0): boolean {
     </div>
   </BasicCard>
 </template>
+
+<style>
+.text-jacquard-24 {
+  font-family: 'Jacquard 24', system-ui;
+}
+</style>

@@ -1,28 +1,15 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-
-import useStandardDeck from '@/composables/useStandardDeck';
-import StandardCardDeck from '@/components/StandardCard/StandardCardDeck.vue';
-import StandardCardDiscard from '@/components/StandardCard/StandardCardDiscard.vue';
-import StandardCardHand from '@/components/StandardCard/StandardCardHand.vue';
-
-onMounted(() => {
-  useStandardDeck.buildDeck();
-});
+import CardSuit from '@/components/StandardCard/CardSuit.vue';
 </script>
 
 <template>
-  <main class="w-screen h-screen">
-    <div class="w-screen h-[50vh] flex justify-center items-end">
-      <div class="flex justify-center gap-2">
-        <StandardCardDeck class="mb-8" />
-
-        <StandardCardDiscard />
+  <main class="w-screen h-screen flex justify-center items-center">
+    <router-link to="/blackjack">
+      <div class="flex"><CardSuit suit="club" /> <CardSuit class="text-red-500" /></div>
+      Play Blackjack
+      <div class="flex">
+        <CardSuit suit="heart" class="text-red-500" /> <CardSuit suit="spade" />
       </div>
-    </div>
-
-    <div class="w-screen h-[50vh] flex justify-center items-start">
-      <StandardCardHand />
-    </div>
+    </router-link>
   </main>
 </template>
