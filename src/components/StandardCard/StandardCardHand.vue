@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import NoCard from '../NoCard.vue';
 import StandardCard from '../StandardCard.vue';
 import type { StandardCard as Card } from './types';
 
@@ -16,19 +17,23 @@ defineProps({
 
 <template>
   <TransitionGroup
-    class="flex ms-20 justify-center gap-2 w-[80vw] flex-wrap"
+    class="flex ms-20 justify-center w-[80vw] flex-wrap gap-2"
     name="card-hand"
-    tag="div"
+    tag="span"
+    :class="{
+      hidden: !hand.length,
+    }"
   >
     <StandardCard
       v-for="(card, index) in hand"
       :key="'hand-' + card.id"
       :card="card"
       :is-face-up="visible === -1 || index <= visible - 1"
-      class="cursor-n-resize -ms-20"
+      class="cursor-default -ms-20"
       :style="`z-index: ${index}`"
     />
   </TransitionGroup>
+  <NoCard v-if="!hand.length"></NoCard>
 </template>
 
 <style scoped>

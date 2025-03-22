@@ -1,1 +1,5 @@
 @import 'tailwindcss';
+
+.text-jacquard-24 {
+  font-family: 'Jacquard 24', system-ui;
+}

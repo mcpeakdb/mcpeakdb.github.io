@@ -51,128 +51,128 @@ function isCard(Card: Card, x = 0): boolean {
 
 <template>
   <BasicCard :value="card.value" :is-face-up="isFaceUp">
-    <div
-      class="flex justify-center align-center h-full w-full p-1 relative"
-      :class="{ 'text-red-500': ['heart', 'diamond'].includes(card.suit) }"
-    >
-      <CornerNumber :card="card" class="top-0 left-0" />
-
-      <span
-        v-if="isFaceCard(card)"
-        class="flex flex-col justify-center items-center h-full w-full flex-wrap gap-1 text-7xl text-jacquard-24"
+    <template #front>
+      <div
+        class="bg-white flex justify-center align-center h-full w-full p-1 relative"
+        :class="{ 'text-red-500': ['heart', 'diamond'].includes(card.suit) }"
       >
-        {{ card.text }}
-      </span>
-      <span
-        v-else-if="isAce(card)"
-        class="flex justify-center items-center h-full w-full text-6xl"
-        :class="{ 'text-8xl': card.suit === 'spade' }"
-      >
-        <CardSuit :suit="card.suit" :text-class="card.suit === 'spade' ? 'text-8xl' : 'text-6xl'" />
-      </span>
-      <span v-else class="h-full w-full relative">
-        <CardSuit
-          v-if="greaterThanX(card, 3)"
-          :suit="card.suit"
-          class="absolute top-0 left-[17%]"
-        />
-        <CardSuit
-          v-if="isCard(card, 2) || isCard(card, 3)"
-          :suit="card.suit"
-          class="absolute top-0 left-[50%] right-[50%]"
-        />
-        <CardSuit
-          v-if="greaterThanX(card, 3)"
-          :suit="card.suit"
-          class="absolute top-0 right-[17%]"
-        />
+        <CornerNumber :card="card" class="top-0 left-0" />
 
-        <CardSuit
-          v-if="isCard(card, 10)"
-          :suit="card.suit"
-          class="absolute top-[26%] bottom-[74%] left-[50%] right-[50%]"
-        />
+        <span
+          v-if="isFaceCard(card)"
+          class="flex flex-col justify-center items-center h-full w-full flex-wrap gap-1 text-7xl text-jacquard-24"
+        >
+          {{ card.text }}
+        </span>
+        <span
+          v-else-if="isAce(card)"
+          class="flex justify-center items-center h-full w-full text-6xl"
+          :class="{ 'text-8xl': card.suit === 'spade' }"
+        >
+          <CardSuit
+            :suit="card.suit"
+            :text-class="card.suit === 'spade' ? 'text-8xl' : 'text-6xl'"
+          />
+        </span>
+        <span v-else class="h-full w-full relative">
+          <CardSuit
+            v-if="greaterThanX(card, 3)"
+            :suit="card.suit"
+            class="absolute top-0 left-[17%]"
+          />
+          <CardSuit
+            v-if="isCard(card, 2) || isCard(card, 3)"
+            :suit="card.suit"
+            class="absolute top-0 left-[50%] right-[50%]"
+          />
+          <CardSuit
+            v-if="greaterThanX(card, 3)"
+            :suit="card.suit"
+            class="absolute top-0 right-[17%]"
+          />
 
-        <CardSuit
-          v-if="isCard(card, 7) || isCard(card, 8)"
-          :suit="card.suit"
-          class="absolute top-[31%] bottom-[69%] left-[50%] right-[50%]"
-        />
+          <CardSuit
+            v-if="isCard(card, 10)"
+            :suit="card.suit"
+            class="absolute top-[26%] bottom-[74%] left-[50%] right-[50%]"
+          />
 
-        <CardSuit
-          v-if="greaterThanX(card, 8)"
-          :suit="card.suit"
-          class="absolute top-[38%] bottom-[62%] left-[17%]"
-        />
-        <CardSuit
-          v-if="greaterThanX(card, 8)"
-          :suit="card.suit"
-          class="absolute top-[38%] bottom-[62%] right-[17%]"
-        />
+          <CardSuit
+            v-if="isCard(card, 7) || isCard(card, 8)"
+            :suit="card.suit"
+            class="absolute top-[31%] bottom-[69%] left-[50%] right-[50%]"
+          />
 
-        <CardSuit
-          v-if="isCard(card, 6) || isCard(card, 7) || isCard(card, 8)"
-          :suit="card.suit"
-          class="absolute top-[50%] bottom-[50%] left-[17%]"
-        />
-        <CardSuit
-          v-if="isCard(card, 3) || isCard(card, 5) || isCard(card, 9)"
-          :suit="card.suit"
-          class="absolute top-[50%] bottom-[50%] left-[50%] right-[50%]"
-        />
-        <CardSuit
-          v-if="isCard(card, 6) || isCard(card, 7) || isCard(card, 8)"
-          :suit="card.suit"
-          class="absolute top-[50%] bottom-[50%] right-[17%]"
-        />
+          <CardSuit
+            v-if="greaterThanX(card, 8)"
+            :suit="card.suit"
+            class="absolute top-[38%] bottom-[62%] left-[17%]"
+          />
+          <CardSuit
+            v-if="greaterThanX(card, 8)"
+            :suit="card.suit"
+            class="absolute top-[38%] bottom-[62%] right-[17%]"
+          />
 
-        <CardSuit
-          v-if="greaterThanX(card, 8)"
-          :suit="card.suit"
-          class="absolute top-[62%] bottom-[38%] left-[17%] rotate-180"
-        />
-        <CardSuit
-          v-if="greaterThanX(card, 8)"
-          :suit="card.suit"
-          class="absolute top-[62%] bottom-[38%] right-[17%] rotate-180"
-        />
+          <CardSuit
+            v-if="isCard(card, 6) || isCard(card, 7) || isCard(card, 8)"
+            :suit="card.suit"
+            class="absolute top-[50%] bottom-[50%] left-[17%]"
+          />
+          <CardSuit
+            v-if="isCard(card, 3) || isCard(card, 5) || isCard(card, 9)"
+            :suit="card.suit"
+            class="absolute top-[50%] bottom-[50%] left-[50%] right-[50%]"
+          />
+          <CardSuit
+            v-if="isCard(card, 6) || isCard(card, 7) || isCard(card, 8)"
+            :suit="card.suit"
+            class="absolute top-[50%] bottom-[50%] right-[17%]"
+          />
 
-        <CardSuit
-          v-if="isCard(card, 8)"
-          :suit="card.suit"
-          class="absolute top-[68%] bottom-[32%] left-[50%] right-[50%] rotate-180"
-        />
+          <CardSuit
+            v-if="greaterThanX(card, 8)"
+            :suit="card.suit"
+            class="absolute top-[62%] bottom-[38%] left-[17%] rotate-180"
+          />
+          <CardSuit
+            v-if="greaterThanX(card, 8)"
+            :suit="card.suit"
+            class="absolute top-[62%] bottom-[38%] right-[17%] rotate-180"
+          />
 
-        <CardSuit
-          v-if="isCard(card, 10)"
-          :suit="card.suit"
-          class="absolute top-[74%] bottom-[26%] left-[50%] right-[50%] rotate-180"
-        />
+          <CardSuit
+            v-if="isCard(card, 8)"
+            :suit="card.suit"
+            class="absolute top-[68%] bottom-[32%] left-[50%] right-[50%] rotate-180"
+          />
 
-        <CardSuit
-          v-if="greaterThanX(card, 3)"
-          :suit="card.suit"
-          class="absolute bottom-0 left-[17%] rotate-180"
-        />
-        <CardSuit
-          v-if="isCard(card, 2) || isCard(card, 3)"
-          :suit="card.suit"
-          class="absolute bottom-0 left-[50%] right-[50%] rotate-180"
-        />
-        <CardSuit
-          v-if="greaterThanX(card, 3)"
-          :suit="card.suit"
-          class="absolute bottom-0 right-[17%] rotate-180"
-        />
-      </span>
+          <CardSuit
+            v-if="isCard(card, 10)"
+            :suit="card.suit"
+            class="absolute top-[74%] bottom-[26%] left-[50%] right-[50%] rotate-180"
+          />
 
-      <CornerNumber :card="card" class="rotate-180 self-end bottom-0 right-0" />
-    </div>
+          <CardSuit
+            v-if="greaterThanX(card, 3)"
+            :suit="card.suit"
+            class="absolute bottom-0 left-[17%] rotate-180"
+          />
+          <CardSuit
+            v-if="isCard(card, 2) || isCard(card, 3)"
+            :suit="card.suit"
+            class="absolute bottom-0 left-[50%] right-[50%] rotate-180"
+          />
+          <CardSuit
+            v-if="greaterThanX(card, 3)"
+            :suit="card.suit"
+            class="absolute bottom-0 right-[17%] rotate-180"
+          />
+        </span>
+
+        <CornerNumber :card="card" class="rotate-180 self-end bottom-0 right-0" />
+      </div>
+    </template>
+    <template #back><div class="bg-red-500 w-full h-full"></div> </template>
   </BasicCard>
 </template>
-
-<style>
-.text-jacquard-24 {
-  font-family: 'Jacquard 24', system-ui;
-}
-</style>

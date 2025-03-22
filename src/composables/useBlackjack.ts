@@ -6,17 +6,20 @@ const { playerHand, computerHand, buildDeck, dealCard, dealComputerCard, sleep, 
   useStandardDeck;
 
 const isDealt = ref(false);
+const showComputerHand = ref(false);
 
 function reset(): void {
   fillDeck();
-  isGameOver.value = true;
   isDealt.value = false;
   isComputerThinking.value = false;
+  showComputerHand.value = false;
+  isGameOver.value = false;
 }
 
 async function dealHand(): Promise<void> {
-  isGameOver.value = false;
+  showComputerHand.value = false;
   isComputerThinking.value = true;
+  isGameOver.value = false;
 
   fillDeck();
 
@@ -91,9 +94,9 @@ function getTotal(hand: StandardCard[]): number {
   return total;
 }
 
-const isGameOver = ref(false);
 async function endTurn(): Promise<void> {
   isComputerThinking.value = true;
+  showComputerHand.value = true;
 
   await sleep();
 
@@ -120,28 +123,29 @@ async function endTurn(): Promise<void> {
   }
 }
 
+const didPlayerWin = ref(false);
 function showResult(didWin: boolean): void {
-  setTimeout(() => {
-    if (didWin) {
-      alert('You win!');
-    } else {
-      alert('Computer wins!');
-    }
-  }, 500);
+  didPlayerWin.value = didWin;
 }
 
+const isGameOver = ref(false);
 function handleEndGame(): void {
   isGameOver.value = true;
+  showComputerHand.value = true;
   isComputerThinking.value = false;
   isDealt.value = false;
 }
 
 export default {
   playerHand,
+  playerHandTotal,
   computerHand,
+  computerHandTotal,
   isComputerThinking,
-  isGameOver,
+  showComputerHand,
   isDealt,
+  didPlayerWin,
+  isGameOver,
   buildDeck,
   dealHand,
   hit,
