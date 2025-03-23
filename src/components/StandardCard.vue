@@ -3,6 +3,8 @@ import { type StandardCard as Card } from './StandardCard/types';
 import CardSuit from './StandardCard/CardSuit.vue';
 import BasicCard from './BasicCard.vue';
 import CornerNumber from './StandardCard/CornerNumber.vue';
+import { CARD_BACKS } from './standardCard.constants';
+import useStandardDeck from '@/composables/useStandardDeck';
 
 defineProps({
   card: {
@@ -23,6 +25,8 @@ defineProps({
     default: false,
   },
 });
+
+const { cardBack } = useStandardDeck;
 
 function isFaceCard(Card: Card): boolean {
   return isNaN(parseInt(Card.text)) && Card.text !== 'A';
@@ -173,6 +177,6 @@ function isCard(Card: Card, x = 0): boolean {
         <CornerNumber :card="card" class="rotate-180 self-end bottom-0 right-0" />
       </div>
     </template>
-    <template #back><div class="bg-red-500 w-full h-full"></div> </template>
+    <template #back><div class="w-full h-full" :class="CARD_BACKS[cardBack]"></div> </template>
   </BasicCard>
 </template>

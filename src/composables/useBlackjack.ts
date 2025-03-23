@@ -2,8 +2,16 @@ import { computed, ref } from 'vue';
 import useStandardDeck from './useStandardDeck';
 import type { StandardCard } from '@/components/StandardCard/types';
 
-const { playerHand, computerHand, buildDeck, dealCard, dealComputerCard, sleep, fillDeck } =
-  useStandardDeck;
+const {
+  cardBack,
+  playerHand,
+  computerHand,
+  buildDeck,
+  dealCard,
+  dealComputerCard,
+  sleep,
+  fillDeck,
+} = useStandardDeck;
 
 const isDealt = ref(false);
 const showComputerHand = ref(false);
@@ -137,6 +145,7 @@ function handleEndGame(): void {
 }
 
 export default {
+  cardBack,
   playerHand,
   playerHandTotal,
   computerHand,

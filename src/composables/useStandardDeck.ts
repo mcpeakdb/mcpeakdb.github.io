@@ -1,3 +1,4 @@
+import type { CARD_BACKS } from '@/components/standardCard.constants';
 import type { StandardCard } from '@/components/StandardCard/types';
 import { computed, ref } from 'vue';
 
@@ -98,9 +99,12 @@ function fillDeck(): void {
   shuffle();
 }
 
+const cardBack = ref<keyof typeof CARD_BACKS>('red');
+
 export default {
   cards,
   cardDeck,
+  cardBack,
   playerHand,
   computerHand,
   discardPile,

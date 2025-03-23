@@ -3,3 +3,35 @@
 .text-jacquard-24 {
   font-family: 'Jacquard 24', system-ui;
 }
+
+.bg-uno-red {
+  @apply bg-[#D72600];
+}
+
+.bg-uno-blue {
+  @apply bg-[#0956BF];
+}
+
+.bg-uno-green {
+  @apply bg-[#379711];
+}
+
+.bg-uno-yellow {
+  @apply bg-[#ECD407];
+}
+
+.text-uno-red {
+  @apply text-[#D72600];
+}
+
+.text-uno-blue {
+  @apply text-[#0956BF];
+}
+
+.text-uno-green {
+  @apply text-[#379711];
+}
+
+.text-uno-yellow {
+  @apply text-[#ECD407];
+}
