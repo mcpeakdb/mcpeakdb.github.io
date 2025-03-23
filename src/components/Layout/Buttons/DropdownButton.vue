@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import ActionButton from './ActionButton.vue';
 import type { DropdownButtonOption } from './dropdownButton.types';
+
 defineProps({
   label: {
     type: String,
