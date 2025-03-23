@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import useStandardDeck from '@/composables/useStandardDeck';
-import StandardCard from '../StandardCard.vue';
+import StandardCard from './StandardCard.vue';
 import NoCard from '../NoCard.vue';
 
 const { topOfDiscardPile } = useStandardDeck;

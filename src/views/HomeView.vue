@@ -8,7 +8,7 @@ import UnoSymbol from '@/components/UnoCard/UnoSymbol.vue';
   <main
     class="w-screen h-screen flex flex-col gap-2 justify-center items-center bg-radial from-neutral-700 to-neutral-800"
   >
-    <router-link to="/blackjack" class="h-fit">
+    <router-link to="/blackjack">
       <ActionButton variant="neutral">
         <div class="flex"><CardSuit suit="club" /> <CardSuit class="text-red-500" /></div>
         Play Blackjack
@@ -17,7 +17,7 @@ import UnoSymbol from '@/components/UnoCard/UnoSymbol.vue';
         </div>
       </ActionButton>
     </router-link>
-    <router-link to="/uno" class="h-fit opacity-80 pointer-events-none">
+    <router-link to="/uno" class="opacity-80 pointer-events-none">
       <ActionButton variant="neutral">
         <div class="flex w-full justify-around">
           <UnoSymbol class="text-uno-red" />

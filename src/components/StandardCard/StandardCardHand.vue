@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import NoCard from '../NoCard.vue';
-import StandardCard from '../StandardCard.vue';
+import StandardCard from './StandardCard.vue';
 import type { StandardCard as Card } from './types';
 
 defineProps({

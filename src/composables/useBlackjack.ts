@@ -4,6 +4,7 @@ import type { StandardCard } from '@/components/StandardCard/types';
 
 const {
   cardBack,
+  cardDeck,
   playerHand,
   computerHand,
   buildDeck,
@@ -17,7 +18,7 @@ const isDealt = ref(false);
 const showComputerHand = ref(false);
 
 function reset(): void {
-  fillDeck();
+  cardDeck.value = [];
   isDealt.value = false;
   isComputerThinking.value = false;
   showComputerHand.value = false;

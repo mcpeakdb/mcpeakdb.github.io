@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import HomeView from '@/views/HomeView.vue';
 import BlackjackView from '@/views/BlackjackView.vue';
+import UnoView from '@/views/UnoView.vue';
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/blackjack',
       name: 'blackjack',
       component: BlackjackView,
+    },
+    {
+      path: '/uno',
+      name: 'uno',
+      component: UnoView,
     },
   ],
 });

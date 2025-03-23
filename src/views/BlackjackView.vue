@@ -7,7 +7,7 @@ import StandardCardHand from '@/components/StandardCard/StandardCardHand.vue';
 import ActionButton from '@/components/Layout/Buttons/ActionButton.vue';
 import TopMenu from '@/components/Layout/TopMenu.vue';
 import BaseAlert from '@/components/Layout/Alerts/BaseAlert.vue';
-import { CARD_BACKS } from '@/components/standardCard.constants';
+import { CARD_BACKS } from '@/components/StandardCard/constants';
 import SimpleModal from '@/components/Layout/SimpleModal.vue';
 
 const {

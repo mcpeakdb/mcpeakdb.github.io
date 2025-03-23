@@ -1,5 +1,5 @@
-import type { CARD_BACKS } from '@/components/standardCard.constants';
-import type { StandardCard } from '@/components/StandardCard/types';
+import type { CARD_BACKS } from '@/components/StandardCard/constants';
+import { SUIT_ASCII, type StandardCard, type Suit } from '@/components/StandardCard/types';
 import { computed, ref } from 'vue';
 
 const cards = [
@@ -27,14 +27,16 @@ async function sleep(ms = 500): Promise<void> {
 }
 
 function buildDeck(): void {
+  const suits = Object.keys(SUIT_ASCII);
+
   for (let i = 0; i < cards.length; i++) {
     for (let j = 0; j < 4; j++) {
-      const suit = j === 0 ? 'heart' : j === 1 ? 'diamond' : j === 2 ? 'club' : 'spade';
+      const suit = suits[j];
       cardDeck.value.push({
         value: cards[i].value,
         id: cards[i].id + '-' + suit,
         text: cards[i].text,
-        suit: suit,
+        suit: suit as Suit,
       });
     }
   }

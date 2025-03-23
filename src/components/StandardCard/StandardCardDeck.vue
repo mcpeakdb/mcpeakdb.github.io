@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import useStandardDeck from '@/composables/useStandardDeck';
 import NoCard from '../NoCard.vue';
-import StandardCard from '../StandardCard.vue';
+import StandardCard from './StandardCard.vue';
 
 const { cardDeck } = useStandardDeck;
 </script>

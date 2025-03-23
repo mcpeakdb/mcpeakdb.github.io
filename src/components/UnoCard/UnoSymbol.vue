@@ -1,9 +1,5 @@
 <script lang="ts" setup>
-const UNO_SYMBOLS = {
-  draw2: '⧉',
-  refresh: '🗘',
-  skip: '🛇',
-};
+import { UNO_SYMBOLS } from './constants';
 
 defineProps({
   symbol: {

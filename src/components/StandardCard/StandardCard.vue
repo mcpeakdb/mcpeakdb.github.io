@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { type StandardCard as Card } from './StandardCard/types';
-import CardSuit from './StandardCard/CardSuit.vue';
-import BasicCard from './BasicCard.vue';
-import CornerNumber from './StandardCard/CornerNumber.vue';
-import { CARD_BACKS } from './standardCard.constants';
+import { type StandardCard as Card } from './types';
+import CardSuit from './CardSuit.vue';
+import BasicCard from '../BasicCard.vue';
+import CornerNumber from './CornerNumber.vue';
+import { CARD_BACKS } from './constants';
 import useStandardDeck from '@/composables/useStandardDeck';
 
 defineProps({
