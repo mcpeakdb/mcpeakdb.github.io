@@ -47,12 +47,11 @@ const stand = () => {
 
 <template>
   <main
-    class="w-screen h-screen overflow-x-hidden"
+    class="w-screen h-screen overflow-x-hidden flex flex-col"
     :class="[{ 'pointer-events-none': gameState.isComputerThinking }, TABLE_THEMES[tableTheme]]"
   >
-    <div class="w-full flex justify-between p-2">
+    <div class="w-full flex justify-between p-2 sticky top-0 z-50 bg-inherit">
       <TopMenu />
-
       <ActionButton @click="settingsModal?.setShow(true)">Settings</ActionButton>
       <SimpleModal ref="settingsModal">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">Game Settings</h2>
@@ -115,7 +114,7 @@ const stand = () => {
       </SimpleModal>
     </div>
 
-    <div class="w-full flex flex-col items-center justify-end gap-2 mt-2">
+    <div class="flex-grow flex flex-col items-center justify-center gap-2 p-2">
       <StandardCardHand
         :card-back="cardBack"
         :hand="computerHand"
@@ -141,7 +140,7 @@ const stand = () => {
       />
     </div>
 
-    <div class="w-full absolute bottom-0 left-0">
+    <div class="w-full sticky bottom-0 left-0 z-50">
       <div v-if="gameState.isGameOver" class="flex justify-center m-2">
         <BaseAlert v-if="didPlayerWin"> 🎉 VICTORY! 🎉 </BaseAlert>
         <BaseAlert v-else variant="danger"> 💀 GAME OVER 💀 </BaseAlert>
