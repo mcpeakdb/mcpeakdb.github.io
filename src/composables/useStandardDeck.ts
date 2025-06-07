@@ -1,5 +1,5 @@
-import type { CARD_BACKS } from '@/components/StandardCard/constants';
-import { SUIT_ASCII, type StandardCard, type Suit } from '@/components/StandardCard/types';
+import type { CARD_BACKS } from '@/constants/cardStyles';
+import { SUIT_ASCII, type StandardCard as StandardCardType, type Suit } from '@/types/cards';
 import { computed, ref } from 'vue';
 
 const cards = [
@@ -16,10 +16,22 @@ const cards = [
   { id: 'j', text: 'J', value: 10 },
   { id: 'q', text: 'Q', value: 10 },
   { id: 'k', text: 'K', value: 10 },
-];
+] as const;
+
+// Create shared state at module level
+const cardDeck = ref<StandardCardType[]>([]);
+const playerHand = ref<StandardCardType[]>([]);
+const computerHand = ref<StandardCardType[]>([]);
+const discardPile = ref<StandardCardType[]>([]);
+const cardBack = ref<keyof typeof CARD_BACKS>('red');
+
+const topOfDiscardPile = computed(() => {
+  if (discardPile.value.length < 1) return null;
+  return discardPile.value[discardPile.value.length - 1];
+});
 
 async function sleep(ms = 500): Promise<void> {
-  return await new Promise((resolve) =>
+  return new Promise((resolve) =>
     setTimeout(() => {
       resolve(undefined);
     }, ms),
@@ -27,7 +39,9 @@ async function sleep(ms = 500): Promise<void> {
 }
 
 function buildDeck(): void {
-  const suits = Object.keys(SUIT_ASCII);
+  const suits = Object.keys(SUIT_ASCII) as Suit[];
+
+  cardDeck.value = []; // Clear existing deck
 
   for (let i = 0; i < cards.length; i++) {
     for (let j = 0; j < 4; j++) {
@@ -36,7 +50,7 @@ function buildDeck(): void {
         value: cards[i].value,
         id: cards[i].id + '-' + suit,
         text: cards[i].text,
-        suit: suit as Suit,
+        suit: suit,
       });
     }
   }
@@ -44,18 +58,15 @@ function buildDeck(): void {
   fillDeck();
 }
 
-function shuffle() {
+function shuffle(): void {
   for (let i = cardDeck.value.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [cardDeck.value[i], cardDeck.value[j]] = [cardDeck.value[j], cardDeck.value[i]];
   }
 }
 
-const cardDeck = ref<StandardCard[]>([]);
-
 function dealCard(): void {
   const topCard = cardDeck.value.shift();
-
   if (topCard) {
     playerHand.value.push(topCard);
   }
@@ -63,29 +74,18 @@ function dealCard(): void {
 
 function dealComputerCard(): void {
   const topCard = cardDeck.value.shift();
-
   if (topCard) {
     computerHand.value.push(topCard);
   }
 }
 
-const playerHand = ref<StandardCard[]>([]);
-const computerHand = ref<StandardCard[]>([]);
-
 function discardCardFromHand(index: number): void {
-  if (playerHand.value.length) {
-    discardPile.value.push(playerHand.value[index]);
-
+  if (playerHand.value.length > index) {
+    const discardedCard = playerHand.value[index];
+    discardPile.value.push(discardedCard);
     playerHand.value.splice(index, 1);
   }
 }
-
-const discardPile = ref<StandardCard[]>([]);
-const topOfDiscardPile = computed(() => {
-  if (discardPile.value.length < 1) return null;
-
-  return discardPile.value[discardPile.value.length - 1];
-});
 
 function fillDeck(): void {
   cardDeck.value = [
@@ -100,9 +100,7 @@ function fillDeck(): void {
   computerHand.value = [];
   shuffle();
 }
-
-const cardBack = ref<keyof typeof CARD_BACKS>('red');
-
+// Export a single instance
 export default {
   cards,
   cardDeck,

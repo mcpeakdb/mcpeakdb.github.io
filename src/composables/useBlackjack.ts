@@ -1,44 +1,53 @@
 import { computed, ref } from 'vue';
 import useStandardDeck from './useStandardDeck';
-import type { StandardCard } from '@/components/StandardCard/types';
+import { type StandardCard as StandardCardType } from '@/types/cards';
 
-const {
-  cardBack,
-  cardDeck,
-  playerHand,
-  computerHand,
-  buildDeck,
-  dealCard,
-  dealComputerCard,
-  sleep,
-  fillDeck,
-} = useStandardDeck;
+// Use the shared instance - don't destructure
+const standardDeck = useStandardDeck;
 
 const isDealt = ref(false);
 const showComputerHand = ref(false);
+const isComputerThinking = ref(false);
+const isGameOver = ref(false);
+const didPlayerWin = ref(false);
+
+// Create gameState object to match your template
+const gameState = computed(() => ({
+  isDealt: isDealt.value,
+  isGameOver: isGameOver.value,
+  isComputerThinking: isComputerThinking.value,
+  showComputerHand: showComputerHand.value,
+}));
 
 function reset(): void {
-  cardDeck.value = [];
+  standardDeck.cardDeck.value = [];
   isDealt.value = false;
   isComputerThinking.value = false;
   showComputerHand.value = false;
   isGameOver.value = false;
 }
 
+function initializeGame(): void {
+  if (standardDeck.cardDeck.value.length === 0) {
+    standardDeck.buildDeck();
+  }
+}
+
 async function dealHand(): Promise<void> {
+  initializeGame();
+
   showComputerHand.value = false;
   isComputerThinking.value = true;
   isGameOver.value = false;
+  standardDeck.fillDeck();
 
-  fillDeck();
-
-  dealCard();
-  await sleep();
-  dealComputerCard();
-  await sleep();
-  dealCard();
-  await sleep();
-  dealComputerCard();
+  standardDeck.dealCard();
+  await standardDeck.sleep();
+  standardDeck.dealComputerCard();
+  await standardDeck.sleep();
+  standardDeck.dealCard();
+  await standardDeck.sleep();
+  standardDeck.dealComputerCard();
 
   if (computerHandTotal.value === 21) {
     handleEndGame();
@@ -51,7 +60,7 @@ async function dealHand(): Promise<void> {
 }
 
 function hit(): void {
-  dealCard();
+  standardDeck.dealCard();
 
   if (playerHandTotal.value > 21) {
     handleEndGame();
@@ -61,15 +70,14 @@ function hit(): void {
 }
 
 const playerHandTotal = computed(() => {
-  return getTotal(playerHand.value);
+  return getTotal(standardDeck.playerHand.value);
 });
 
-const isComputerThinking = ref(false);
 const computerHandTotal = computed(() => {
-  return getTotal(computerHand.value);
+  return getTotal(standardDeck.computerHand.value);
 });
 
-function getTotal(hand: StandardCard[]): number {
+function getTotal(hand: StandardCardType[]): number {
   let total = 0;
   let totalAces = 0;
 
@@ -106,13 +114,11 @@ function getTotal(hand: StandardCard[]): number {
 async function endTurn(): Promise<void> {
   isComputerThinking.value = true;
   showComputerHand.value = true;
-
-  await sleep();
+  await standardDeck.sleep();
 
   while (computerHandTotal.value < 17) {
-    dealComputerCard();
-
-    await sleep();
+    standardDeck.dealComputerCard();
+    await standardDeck.sleep();
   }
 
   handleEndGame();
@@ -120,7 +126,7 @@ async function endTurn(): Promise<void> {
   if (computerHandTotal.value > 21) {
     showResult(true);
   } else if (computerHandTotal.value === playerHandTotal.value) {
-    if (computerHand.value.length >= playerHand.value.length) {
+    if (standardDeck.computerHand.value.length >= standardDeck.playerHand.value.length) {
       showResult(false);
     } else {
       showResult(true);
@@ -132,12 +138,10 @@ async function endTurn(): Promise<void> {
   }
 }
 
-const didPlayerWin = ref(false);
 function showResult(didWin: boolean): void {
   didPlayerWin.value = didWin;
 }
 
-const isGameOver = ref(false);
 function handleEndGame(): void {
   isGameOver.value = true;
   showComputerHand.value = true;
@@ -146,17 +150,16 @@ function handleEndGame(): void {
 }
 
 export default {
-  cardBack,
-  playerHand,
+  gameState,
+  playerHand: standardDeck.playerHand,
   playerHandTotal,
-  computerHand,
+  computerHand: standardDeck.computerHand,
   computerHandTotal,
-  isComputerThinking,
-  showComputerHand,
-  isDealt,
+
   didPlayerWin,
-  isGameOver,
-  buildDeck,
+
+  cardBack: standardDeck.cardBack,
+  initializeGame,
   dealHand,
   hit,
   endTurn,

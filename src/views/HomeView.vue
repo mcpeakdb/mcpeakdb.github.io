@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ActionButton from '@/components/Layout/Buttons/ActionButton.vue';
-import CardSuit from '@/components/StandardCard/CardSuit.vue';
+import CardSuit from '@/components/CardSuit.vue';
 import UnoSymbol from '@/components/UnoCard/UnoSymbol.vue';
 </script>
 
@@ -10,7 +10,9 @@ import UnoSymbol from '@/components/UnoCard/UnoSymbol.vue';
   >
     <router-link to="/blackjack">
       <ActionButton variant="neutral">
-        <div class="flex"><CardSuit suit="club" /> <CardSuit class="text-red-500" /></div>
+        <div class="flex">
+          <CardSuit suit="club" /> <CardSuit suit="diamond" class="text-red-500" />
+        </div>
         Play Blackjack
         <div class="flex">
           <CardSuit suit="heart" class="text-red-500" /> <CardSuit suit="spade" />

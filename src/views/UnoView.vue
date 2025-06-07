@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import useUnoDeck from '@/composables/useUnoDeck';
 import { onMounted, onUnmounted, ref } from 'vue';
-import BasicCard from '@/components/BasicCard.vue';
+import BaseCard from '@/components/BaseCard.vue';
 
-const { cardDeck, buildDeck, reset } = useUnoDeck;
+const { cardDeck, buildDeck, reset } = useUnoDeck();
 
 const cardClasses = ref({
   red: 'bg-uno-red',
@@ -23,7 +23,7 @@ onUnmounted(() => {
 
 <template>
   <div class="flex flex-wrap">
-    <BasicCard v-for="card in cardDeck" :key="card.id" is-face-up>
+    <BaseCard v-for="card in cardDeck" :key="card.id" is-face-up>
       <template #front>
         <div
           :class="cardClasses[card.suit]"
@@ -57,6 +57,6 @@ onUnmounted(() => {
           </div>
         </div>
       </template>
-    </BasicCard>
+    </BaseCard>
   </div>
 </template>
