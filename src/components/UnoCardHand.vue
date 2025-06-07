@@ -94,8 +94,7 @@ const handleCardClick = (index: number) => {
       <div v-else class="relative h-full w-full">
         <!-- Top-left corner -->
         <div
-          class="absolute left-0 top-0 text-xs font-bold ml-0.5 mt-0.5"
-          style="-webkit-text-stroke: 0.5px black"
+          class="absolute left-0 top-0 text-xs font-bold ml-0.5 mt-0.5 drop-shadow-[0_1px_1px_rgba(0,0,0,1)]"
         >
           <span v-if="card.value === 12">+2</span>
           <span v-else-if="card.value === 14">+4</span>
@@ -104,9 +103,8 @@ const handleCardClick = (index: number) => {
 
         <!-- Center -->
         <div
-          class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold"
+          class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,1)]"
           :class="size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-2xl' : 'text-base'"
-          style="-webkit-text-stroke: 1px black"
         >
           <span v-if="card.value === 12">+2</span>
           <span v-else-if="card.value === 14">+4</span>
@@ -115,8 +113,7 @@ const handleCardClick = (index: number) => {
 
         <!-- Bottom-right corner (rotated) -->
         <div
-          class="absolute right-0 bottom-0 text-xs font-bold mr-0.5 mb-0.5 rotate-180"
-          style="-webkit-text-stroke: 0.5px black"
+          class="absolute right-0 bottom-0 text-xs font-bold mr-0.5 mb-0.5 rotate-180 drop-shadow-[0_1px_1px_rgba(0,0,0,1)]"
         >
           <span v-if="card.value === 12">+2</span>
           <span v-else-if="card.value === 14">+4</span>

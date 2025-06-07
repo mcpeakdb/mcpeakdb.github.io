@@ -26,7 +26,6 @@ import UnoSymbol from '@/components/UnoCard/UnoSymbol.vue';
     <router-link to="/uno">
       <ActionButton variant="neutral">
         <div class="flex w-full justify-around">
-          <UnoSymbol class="text-uno-red" />
           <UnoSymbol class="text-uno-blue" symbol="refresh" />
         </div>
         Play
@@ -34,7 +33,6 @@ import UnoSymbol from '@/components/UnoCard/UnoSymbol.vue';
         Now in Beta!
         <div class="flex w-full justify-around">
           <UnoSymbol class="text-uno-green" symbol="skip" />
-          <UnoSymbol class="text-uno-yellow" />
         </div>
       </ActionButton>
     </router-link>
