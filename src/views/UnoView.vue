@@ -146,7 +146,7 @@ const handleDrawCard = () => {
         </SimpleModal>
       </div>
 
-      <div class="flex-grow flex flex-col items-center justify-end gap-2 mt-2">
+      <div class="flex-grow flex flex-col items-center justify-end gap-2 my-2">
         <UnoCardHand
           :card-back="cardBack"
           :hand="computerHand"
@@ -249,7 +249,7 @@ const handleDrawCard = () => {
       v-if="gameState.isGameOver"
       class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
     >
-      <div class="bg-white rounded-xl p-8 text-center max-w-md mx-4">
+      <div class="bg-white text-black rounded-xl p-8 text-center max-w-md mx-4">
         <h2 class="text-3xl font-bold mb-4">
           {{ didPlayerWin ? '🎉 UNO VICTORY! 🎉' : '💀 YOU LOSE! 💀' }}
         </h2>
