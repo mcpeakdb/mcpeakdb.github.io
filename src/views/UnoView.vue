@@ -146,7 +146,7 @@ const handleDrawCard = () => {
         </SimpleModal>
       </div>
 
-      <div class="flex-grow flex flex-col items-center justify-end gap-2 my-2">
+      <div class="flex-grow flex flex-col items-center justify-center gap-2 my-2">
         <UnoCardHand
           :card-back="cardBack"
           :hand="computerHand"
