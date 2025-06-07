@@ -8,6 +8,9 @@ import UnoSymbol from '@/components/UnoCard/UnoSymbol.vue';
   <main
     class="w-screen h-screen flex flex-col gap-2 justify-center items-center bg-radial from-neutral-700 to-neutral-800"
   >
+    <img src="@/assets/logo.png" alt="Logo" class="w-32 h-32 mb-4" />
+    <h1 class="text-4xl font-bold text-white mb-2">Welcome to Card Games</h1>
+    <p class="text-lg text-gray-300 mb-6">Choose a game to play!</p>
     <router-link to="/blackjack">
       <ActionButton variant="neutral">
         <div class="flex w-full justify-around">
