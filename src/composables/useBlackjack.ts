@@ -159,6 +159,7 @@ export default {
   didPlayerWin,
 
   cardBack: standardDeck.cardBack,
+  tableTheme: standardDeck.tableTheme,
   initializeGame,
   dealHand,
   hit,

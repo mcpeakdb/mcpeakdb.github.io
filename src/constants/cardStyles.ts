@@ -1,9 +1,14 @@
 export const CARD_BACKS = {
-  red: 'bg-red-500',
-  blue: 'bg-blue-500',
-  green: 'bg-green-500',
-  purple: 'bg-purple-500',
-  gradient: 'bg-gradient-to-br from-red-500 to-blue-500',
+  red: 'bg-red-500 bg-opacity-90 shadow-inner shadow-red-700 text-white contrast-100',
+  blue: 'bg-blue-500 bg-opacity-90 shadow-inner shadow-blue-700 text-white contrast-100',
+  green: 'bg-green-500 bg-opacity-90 shadow-inner shadow-green-700 text-white contrast-100',
+  purple: 'bg-purple-500 bg-opacity-90 shadow-inner shadow-purple-700 text-white contrast-100',
+  gradient:
+    'bg-gradient-to-br from-red-500 via-purple-500 to-blue-500 shadow-lg text-white contrast-100',
+  rainbow:
+    'bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-gradient text-white contrast-100',
+  cosmic:
+    'bg-black bg-opacity-90 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-600 via-blue-900 to-black animate-pulse text-white contrast-100',
 } as const;
 
 export const CARD_SIZES = {

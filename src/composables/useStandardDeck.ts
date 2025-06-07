@@ -1,4 +1,5 @@
 import type { CARD_BACKS } from '@/constants/cardStyles';
+import type { TABLE_THEMES } from '@/constants/tableThemes';
 import { SUIT_ASCII, type StandardCard as StandardCardType, type Suit } from '@/types/cards';
 import { computed, ref } from 'vue';
 
@@ -24,6 +25,7 @@ const playerHand = ref<StandardCardType[]>([]);
 const computerHand = ref<StandardCardType[]>([]);
 const discardPile = ref<StandardCardType[]>([]);
 const cardBack = ref<keyof typeof CARD_BACKS>('red');
+const tableTheme = ref<keyof typeof TABLE_THEMES>('classic');
 
 const topOfDiscardPile = computed(() => {
   if (discardPile.value.length < 1) return null;
@@ -105,6 +107,7 @@ export default {
   cards,
   cardDeck,
   cardBack,
+  tableTheme,
   playerHand,
   computerHand,
   discardPile,

@@ -8,6 +8,7 @@ import ActionButton from '@/components/Layout/Buttons/ActionButton.vue';
 import TopMenu from '@/components/Layout/TopMenu.vue';
 import BaseAlert from '@/components/Layout/Alerts/BaseAlert.vue';
 import { CARD_BACKS } from '@/constants/cardStyles';
+import { TABLE_THEMES } from '@/constants/tableThemes';
 import SimpleModal from '@/components/Layout/SimpleModal.vue';
 
 const {
@@ -18,6 +19,7 @@ const {
   computerHandTotal,
   didPlayerWin,
   cardBack,
+  tableTheme,
   initializeGame,
   dealHand,
   hit,
@@ -45,32 +47,71 @@ const stand = () => {
 
 <template>
   <main
-    class="w-screen h-screen bg-radial bg-green-700 to-green-950 overflow-x-hidden"
-    :class="{ 'pointer-events-none': gameState.isComputerThinking }"
+    class="w-screen h-screen overflow-x-hidden"
+    :class="[{ 'pointer-events-none': gameState.isComputerThinking }, TABLE_THEMES[tableTheme]]"
   >
     <div class="w-full flex justify-between p-2">
       <TopMenu />
 
       <ActionButton @click="settingsModal?.setShow(true)">Settings</ActionButton>
       <SimpleModal ref="settingsModal">
-        <h2 class="text-2xl font-bold mb-2">Settings</h2>
+        <h2 class="text-2xl md:text-3xl font-bold mb-4">Game Settings</h2>
 
-        <h5 class="text-lg font-semibold">Card Back</h5>
-        <label
-          v-for="(_back, index) in CARD_BACKS"
-          :key="index"
-          :for="`card-back-${index}`"
-          class="capitalize w-full flex justify-between"
-        >
-          {{ index }}
-          <input
-            :id="`card-back-${index}`"
-            v-model="cardBack"
-            :value="index"
-            type="radio"
-            name="card-back"
-          />
-        </label>
+        <div class="space-y-6">
+          <div class="setting-section">
+            <h5 class="text-lg md:text-xl font-semibold mb-3">Card Back Style</h5>
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                v-for="(back, name) in CARD_BACKS"
+                :key="name"
+                class="p-2 rounded-lg cursor-pointer hover:opacity-80 transition-opacity capitalize bg-gradient-to-br"
+                :class="back"
+                @click="cardBack = name"
+              >
+                {{ name }}
+              </button>
+            </div>
+          </div>
+
+          <!-- <div class="setting-section">
+            <h5 class="text-lg md:text-xl font-semibold mb-3">Game Options</h5>
+            <div class="space-y-3">
+              <label
+                class="flex items-center justify-between p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <span>Sound Effects</span>
+                <input type="checkbox" class="w-4 h-4 accent-green-600" />
+              </label>
+              <label
+                class="flex items-center justify-between p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <span>Animations</span>
+                <input type="checkbox" class="w-4 h-4 accent-green-600" checked />
+              </label>
+              <label
+                class="flex items-center justify-between p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <span>Auto Stand on 21</span>
+                <input type="checkbox" class="w-4 h-4 accent-green-600" checked />
+              </label>
+            </div>
+          </div> -->
+
+          <div class="setting-section">
+            <h5 class="text-lg md:text-xl font-semibold mb-3">Table Theme</h5>
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                v-for="(theme, name) in TABLE_THEMES"
+                :key="name"
+                class="p-2 rounded-lg cursor-pointer hover:opacity-80 transition-opacity capitalize bg-gradient-to-br"
+                :class="theme"
+                @click="tableTheme = name"
+              >
+                {{ name }}
+              </button>
+            </div>
+          </div>
+        </div>
       </SimpleModal>
     </div>
 
@@ -101,24 +142,33 @@ const stand = () => {
     </div>
 
     <div class="w-full absolute bottom-0 left-0">
-      <div v-if="gameState.isGameOver" class="flex justify-center m-2 text-2xl">
-        <BaseAlert v-if="didPlayerWin"> You win! </BaseAlert>
-        <BaseAlert v-else variant="danger"> Better luck next time... </BaseAlert>
+      <div v-if="gameState.isGameOver" class="flex justify-center m-2">
+        <BaseAlert v-if="didPlayerWin"> 🎉 VICTORY! 🎉 </BaseAlert>
+        <BaseAlert v-else variant="danger"> 💀 GAME OVER 💀 </BaseAlert>
       </div>
 
-      <div class="flex justify-between bg-black p-2 pt-3 rounded-t-xl text-2xl text-white">
-        <div class="flex-1 flex-grow">Your Hand: {{ playerHandTotal }}</div>
+      <div
+        class="flex justify-between bg-black/90 backdrop-blur-sm p-3 md:p-4 pt-4 md:pt-5 rounded-t-2xl text-white shadow-lg"
+      >
+        <div class="flex-1 flex-grow text-center">
+          <div class="text-sm md:text-lg uppercase tracking-wider text-gray-400">Your Hand</div>
+          <div class="text-2xl md:text-3xl font-bold">{{ playerHandTotal }}</div>
+        </div>
 
         <div
-          class="flex flex-1 flex-grow justify-center"
+          class="flex flex-1 flex-grow justify-center items-center px-2 md:px-4 border-x border-gray-700"
           :class="{
             'pointer-events-none': gameState.isComputerThinking,
           }"
         >
-          <ActionButton v-if="!gameState.isDealt" @click="dealHand"> Deal </ActionButton>
-          <div v-else class="flex gap-2">
-            <ActionButton @click="hit"> Hit </ActionButton>
+          <ActionButton v-if="!gameState.isDealt" class="text-base md:text-xl" @click="dealHand">
+            Deal
+          </ActionButton>
+
+          <div v-else class="flex gap-2 md:gap-3">
+            <ActionButton class="text-base md:text-xl" @click="hit"> Hit </ActionButton>
             <ActionButton
+              class="text-base md:text-xl"
               :class="{
                 'opacity-50 cursor-not-allowed': playerHand.length < 2,
                 'cursor-pointer': playerHand.length >= 2,
@@ -131,9 +181,12 @@ const stand = () => {
           </div>
         </div>
 
-        <div class="flex flex-1 flex-grow justify-end">
-          Dealer Hand:&nbsp;<span v-if="gameState.showComputerHand">{{ computerHandTotal }}</span
-          ><span v-else>??</span>
+        <div class="flex-1 flex-grow text-center">
+          <div class="text-sm md:text-lg uppercase tracking-wider text-gray-400">Dealer Hand</div>
+          <div class="text-2xl md:text-3xl font-bold">
+            <span v-if="gameState.showComputerHand">{{ computerHandTotal }}</span>
+            <span v-else class="text-yellow-500">??</span>
+          </div>
         </div>
       </div>
     </div>
