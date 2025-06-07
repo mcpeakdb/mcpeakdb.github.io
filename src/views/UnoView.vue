@@ -130,7 +130,7 @@ const handleDrawCard = () => {
             <div class="setting-section">
               <h5 class="text-lg md:text-xl font-semibold mb-3">Report Issues</h5>
               <a
-                href="https://github.com/mcpeakdb/mcpeakdb.github.io//issues"
+                href="https://github.com/mcpeakdb/mcpeakdb.github.io/issues/new?assignees=&labels=bug&template=bug_report.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="p-2 rounded-lg cursor-pointer hover:opacity-80 transition-opacity capitalize bg-gradient-to-br from-gray-700 to-gray-900 text-white text-center"
