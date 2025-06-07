@@ -10,11 +10,11 @@ import UnoSymbol from '@/components/UnoCard/UnoSymbol.vue';
   >
     <router-link to="/blackjack">
       <ActionButton variant="neutral">
-        <div class="flex">
+        <div class="flex w-full justify-around">
           <CardSuit suit="club" /> <CardSuit suit="diamond" class="text-red-500" />
         </div>
         Play Blackjack
-        <div class="flex">
+        <div class="flex w-full justify-around">
           <CardSuit suit="heart" class="text-red-500" /> <CardSuit suit="spade" />
         </div>
       </ActionButton>
