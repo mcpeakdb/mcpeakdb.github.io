@@ -1,0 +1,36 @@
+```bash
+# Bug related
+bug
+critical
+high-priority
+needs-reproduction
+
+# Features
+enhancement
+feature-request
+game-enhancement
+new-game
+
+# Games
+blackjack
+uno
+general-ui
+
+# Status
+in-progress
+needs-review
+ready-for-testing
+wont-fix
+duplicate
+
+# Type
+question
+documentation
+good-first-issue
+help-wanted
+
+# Platform
+mobile
+desktop
+browser-specific
+```
