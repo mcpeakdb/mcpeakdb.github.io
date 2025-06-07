@@ -76,6 +76,7 @@ const stand = () => {
 
     <div class="w-full flex flex-col items-center justify-end gap-2 mt-2">
       <StandardCardHand
+        :card-back="cardBack"
         :hand="computerHand"
         :visible="gameState.showComputerHand ? -1 : 1"
         size="md"
@@ -90,7 +91,13 @@ const stand = () => {
         class="mt-2.5 mb-1.5"
       />
 
-      <StandardCardHand :hand="playerHand" :visible="-1" size="md" orientation="horizontal" />
+      <StandardCardHand
+        :card-back="cardBack"
+        :hand="playerHand"
+        :visible="-1"
+        size="md"
+        orientation="horizontal"
+      />
     </div>
 
     <div class="w-full absolute bottom-0 left-0">

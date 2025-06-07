@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { type StandardCard as StandardCardType } from '@/types/cards';
-import { type CardSize } from '@/constants/cardStyles';
+import { type CardBack, type CardSize } from '@/constants/cardStyles';
 import StandardCard from './StandardCard.vue';
 import NoCard from './NoCard.vue';
 
@@ -9,6 +9,7 @@ interface Props {
   hand: StandardCardType[];
   visible?: number;
   size?: CardSize;
+  cardBack: CardBack;
   isInteractive?: boolean;
   allowSelection?: boolean;
   selectedCards?: string[];
@@ -20,6 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
   hand: () => [],
   visible: -1,
   size: 'md',
+  cardBack: 'red',
   isInteractive: false,
   allowSelection: false,
   selectedCards: () => [],
@@ -82,6 +84,7 @@ const handleHandClick = () => {
           :key="`hand-${card.id}`"
           :card="card"
           :size="size"
+          :card-back="cardBack"
           :is-face-up="isCardVisible(index)"
           :is-interactive="isInteractive"
           :is-selected="isCardSelected(card)"
