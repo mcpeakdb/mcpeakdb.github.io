@@ -186,20 +186,17 @@ const handleCardClick = (card: StandardCard | undefined) => {
     <template #back>
       <div
         v-if="cardBack === 'uno'"
-        class="w-full h-full relative rounded-lg shadow-lg overflow-hidden bg-black border-4 border-white"
+        class="w-full h-full relative rounded-lg shadow-lg overflow-hidden bg-black"
       >
         <!-- Red Oval -->
         <div class="absolute inset-0 flex justify-center items-center">
-          <div class="w-64 h-64 rounded-full bg-red-600 transform rotate-45 scale-110"></div>
+          <div class="w-[75%] h-full rounded-[100%] bg-red-600 transform rotate-45 scale-110"></div>
         </div>
 
         <!-- UNO Text (replace with image or logo if needed) -->
         <div class="absolute inset-0 flex justify-center items-center">
-          <span class="text-4xl font-extrabold italic text-yellow-300 drop-shadow-lg">UNO</span>
+          <span class="text-xl font-extrabold italic text-yellow-300 drop-shadow-lg">UNO</span>
         </div>
-
-        <!-- White Border Effect (inner shadow) -->
-        <div class="absolute inset-0 border-4 border-white rounded-lg pointer-events-none"></div>
       </div>
       <div v-else class="w-full h-full" :class="CARD_BACKS[cardBack]"></div>
     </template>
