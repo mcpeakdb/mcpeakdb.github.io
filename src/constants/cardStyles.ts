@@ -9,7 +9,7 @@ export const CARD_BACKS = {
     'bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-gradient text-white contrast-100',
   cosmic:
     'bg-black bg-opacity-90 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-600 via-blue-900 to-black animate-pulse text-white contrast-100',
-  uno: 'bg-gradient-to-br from-yellow-500 via-red-500 to-blue-500 shadow-lg text-white contrast-100',
+  uno: 'bg-black text-white',
 } as const;
 
 export const CARD_SIZES = {

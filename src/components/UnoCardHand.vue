@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { UnoCard } from '@/composables/useUno';
+import UnoCardComponent from './UnoCard.vue';
 
 interface Props {
   hand: UnoCard[];
   cardBack?: string;
   visible?: number; // -1 = all visible, 0 = all hidden, positive number = show that many
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   orientation?: 'horizontal' | 'vertical';
   isInteractive?: boolean;
+  highlightedCardIndex?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -17,41 +19,12 @@ const props = withDefaults(defineProps<Props>(), {
   size: 'md',
   orientation: 'horizontal',
   isInteractive: true,
+  highlightedCardIndex: -1,
 });
 
 const emit = defineEmits<{
   cardClicked: [cardIndex: number];
 }>();
-
-const sizeClasses = computed(() => {
-  switch (props.size) {
-    case 'sm':
-      return 'w-12 h-16 text-xs';
-    case 'lg':
-      return 'w-24 h-32 text-lg';
-    default:
-      return 'w-16 h-24 text-sm';
-  }
-});
-
-const cardBackClasses = computed(() => {
-  switch (props.cardBack) {
-    case 'blue':
-      return 'bg-blue-600';
-    case 'red':
-      return 'bg-red-600';
-    default:
-      return 'bg-gray-800';
-  }
-});
-
-const cardClasses = {
-  red: 'bg-uno-red',
-  green: 'bg-uno-green',
-  blue: 'bg-uno-blue',
-  yellow: 'bg-uno-yellow',
-  wild: 'bg-gradient-to-br from-red-500 via-yellow-500 via-green-500 to-blue-500',
-};
 
 const isCardVisible = (index: number): boolean => {
   if (props.visible === -1) return true;
@@ -64,62 +37,33 @@ const handleCardClick = (index: number) => {
     emit('cardClicked', index);
   }
 };
+
+const getCardSpacing = computed(() => {
+  const baseSpacing = 'gap-1';
+  if (props.hand.length > 10) return 'gap-0.5 -space-x-2';
+  if (props.hand.length > 7) return 'gap-0.5 -space-x-1';
+  return baseSpacing;
+});
 </script>
 
 <template>
   <div
     :class="[
-      'flex gap-1',
+      'flex',
+      getCardSpacing,
       orientation === 'vertical' ? 'flex-col' : 'flex-row flex-wrap justify-center',
     ]"
   >
-    <div
+    <UnoCardComponent
       v-for="(card, index) in hand"
       :key="card.id"
-      :class="[
-        sizeClasses,
-        'border-2 border-white rounded-lg flex items-center justify-center font-bold transition-all duration-200',
-        isInteractive && isCardVisible(index)
-          ? 'cursor-pointer hover:scale-105 hover:-translate-y-2'
-          : '',
-        !isCardVisible(index) ? cardBackClasses : cardClasses[card.suit],
-      ]"
-      class="relative text-white"
+      :card="card"
+      :card-back="cardBack"
+      :size="size"
+      :is-visible="isCardVisible(index)"
+      :is-interactive="isInteractive && isCardVisible(index)"
+      :is-highlighted="highlightedCardIndex === index"
       @click="handleCardClick(index)"
-    >
-      <!-- Card Back -->
-      <div v-if="!isCardVisible(index)" class="text-center">UNO</div>
-
-      <!-- Card Front -->
-      <div v-else class="relative h-full w-full">
-        <!-- Top-left corner -->
-        <div
-          class="absolute left-0 top-0 text-xs font-bold ml-0.5 mt-0.5 drop-shadow-[0_1px_1px_rgba(0,0,0,1)]"
-        >
-          <span v-if="card.value === 12">+2</span>
-          <span v-else-if="card.value === 14">+4</span>
-          <span v-else>{{ card.text }}</span>
-        </div>
-
-        <!-- Center -->
-        <div
-          class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,1)]"
-          :class="size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-2xl' : 'text-base'"
-        >
-          <span v-if="card.value === 12">+2</span>
-          <span v-else-if="card.value === 14">+4</span>
-          <span v-else>{{ card.text }}</span>
-        </div>
-
-        <!-- Bottom-right corner (rotated) -->
-        <div
-          class="absolute right-0 bottom-0 text-xs font-bold mr-0.5 mb-0.5 rotate-180 drop-shadow-[0_1px_1px_rgba(0,0,0,1)]"
-        >
-          <span v-if="card.value === 12">+2</span>
-          <span v-else-if="card.value === 14">+4</span>
-          <span v-else>{{ card.text }}</span>
-        </div>
-      </div>
-    </div>
+    />
   </div>
 </template>

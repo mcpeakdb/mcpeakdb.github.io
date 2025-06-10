@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, computed } from 'vue';
 import useUno from '@/composables/useUno';
 import UnoCardDeck from '@/components/UnoCardDeck.vue';
 import UnoCardHand from '@/components/UnoCardHand.vue';
+import UnoCardComponent from '@/components/UnoCard.vue';
 import ActionButton from '@/components/Layout/Buttons/ActionButton.vue';
 import TopMenu from '@/components/Layout/TopMenu.vue';
 import BaseAlert from '@/components/Layout/Alerts/BaseAlert.vue';
@@ -15,20 +16,22 @@ const {
   gameState,
   playerHand,
   computerHand,
+  deck,
   currentCard,
   currentColor,
   isPlayerTurn,
   canPlayCard,
+  canDrawCard,
   didPlayerWin,
   cardBack,
   tableTheme,
   initializeGame,
-  dealCards,
   playCard,
   drawCard,
   endTurn,
   reset,
   setWildColor,
+  playDrawnCard,
 } = useUno;
 
 onMounted(() => {
@@ -78,7 +81,59 @@ const handleColorChoice = (color: string) => {
 };
 
 const handleDrawCard = () => {
-  drawCard();
+  if (canDrawCard.value) {
+    drawCard();
+  }
+};
+
+const handlePlayDrawnCard = () => {
+  playDrawnCard();
+};
+
+const getCurrentTurnText = () => {
+  if (!gameState.isDealt) {
+    return 'Dealing cards...';
+  }
+  if (gameState.playerJustDrewCard) {
+    return 'Choose to play drawn card or pass';
+  }
+  return isPlayerTurn.value ? 'Your Turn' : "Computer's Turn";
+};
+
+const getCurrentTurnClass = () => {
+  if (!gameState.isDealt) {
+    return 'text-blue-400';
+  }
+  if (gameState.isComputerThinking) {
+    return 'text-yellow-400';
+  }
+  if (gameState.playerJustDrewCard) {
+    return 'text-orange-400';
+  }
+  return isPlayerTurn.value ? 'text-green-400' : 'text-blue-400';
+};
+
+const drawnCardIndex = computed(() => {
+  if (!gameState.drawnCard) return -1;
+  return playerHand.value.findIndex((card) => card.id === gameState.drawnCard!.id);
+});
+
+const deckCardsRemaining = computed(() => deck.value.length);
+
+const getDrawButtonText = () => {
+  if (!canDrawCard.value) {
+    if (gameState.playerJustDrewCard) return 'Already Drew';
+    if (gameState.isComputerThinking) return 'Computer Turn';
+    return 'Cannot Draw';
+  }
+  return 'Draw Card';
+};
+
+const getPassButtonText = () => {
+  if (gameState.playerJustDrewCard) {
+    return 'Pass Turn';
+  }
+  return 'Skip Turn';
 };
 </script>
 
@@ -89,10 +144,21 @@ const handleDrawCard = () => {
     :class="[{ 'pointer-events-none': gameState.isComputerThinking }, TABLE_THEMES[tableTheme]]"
   >
     <div :style="{ height: contentHeight }" class="relative flex flex-col">
-      <div class="w-full flex justify-between p-2">
+      <div class="w-full flex justify-between items-center p-2">
         <TopMenu />
 
+        <!-- Turn Indicator -->
+        <div class="flex items-center">
+          <div
+            class="px-4 py-2 rounded-lg bg-black/70 backdrop-blur-sm text-white font-bold text-lg text-center"
+            :class="getCurrentTurnClass()"
+          >
+            {{ getCurrentTurnText() }}
+          </div>
+        </div>
+
         <ActionButton @click="settingsModal?.setShow(true)">Settings</ActionButton>
+
         <SimpleModal ref="settingsModal">
           <h2 class="text-2xl md:text-3xl font-bold mb-4">Game Settings</h2>
 
@@ -133,7 +199,7 @@ const handleDrawCard = () => {
                 href="https://github.com/mcpeakdb/mcpeakdb.github.io/issues/new?assignees=&labels=bug&template=bug_report.md"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="p-2 rounded-lg cursor-pointer hover:opacity-80 transition-opacity capitalize bg-gradient-to-br from-gray-700 to-gray-900 text-white text-center"
+                class="p-2 rounded-lg cursor-pointer hover:opacity-80 transition-opacity capitalize bg-gradient-to-br from-gray-700 to-gray-900 text-white text-center block"
               >
                 GitHub Issues
               </a>
@@ -147,54 +213,78 @@ const handleDrawCard = () => {
       </div>
 
       <div class="flex-grow flex flex-col items-center justify-center gap-2 my-2">
+        <!-- Computer Hand -->
         <UnoCardHand
           :card-back="cardBack"
           :hand="computerHand"
           :visible="0"
-          size="sm"
+          size="md"
           orientation="horizontal"
           :is-interactive="false"
           class="mb-2"
         />
 
+        <!-- Game Area -->
         <div class="flex gap-4 items-center mb-2">
+          <!-- Draw Pile -->
           <UnoCardDeck
             :card-back="cardBack"
             size="md"
             :show-count="true"
-            class="cursor-pointer"
+            :disabled="!canDrawCard"
+            :cards-remaining="deckCardsRemaining"
             @click="handleDrawCard"
           />
 
+          <!-- Current Color Indicator -->
           <div class="text-center">
             <div class="text-sm text-white mb-1">Current Color</div>
             <div
-              class="w-8 h-8 rounded-full border-2 border-white"
+              class="w-8 h-8 rounded-full border-2 border-white shadow-lg"
               :class="`bg-uno-${currentColor}`"
             ></div>
           </div>
 
+          <!-- Discard Pile -->
           <div v-if="currentCard" class="relative">
             <div class="text-sm text-white mb-1 text-center">Discard Pile</div>
-            <div
-              :class="`bg-uno-${currentCard.suit}`"
-              class="w-20 h-28 border-4 border-white rounded-lg text-white flex items-center justify-center text-2xl font-bold"
-              style="-webkit-text-stroke: 1px black"
-            >
-              {{ currentCard.text }}
-            </div>
+            <UnoCardComponent
+              :card="currentCard"
+              size="md"
+              :is-visible="true"
+              :is-interactive="false"
+            />
           </div>
         </div>
 
+        <!-- Player Hand -->
         <UnoCardHand
           :card-back="cardBack"
           :hand="playerHand"
           :visible="-1"
           size="md"
           orientation="horizontal"
-          :is-interactive="isPlayerTurn"
+          :is-interactive="isPlayerTurn && !gameState.isComputerThinking && gameState.isDealt"
+          :highlighted-card-index="drawnCardIndex"
           @card-clicked="handleCardPlay"
         />
+
+        <!-- Drawn Card Action -->
+        <div v-if="gameState.playerJustDrewCard && gameState.drawnCard" class="mt-2">
+          <BaseAlert>
+            You drew a {{ gameState.drawnCard.text }}!
+            <span v-if="canPlayCard(gameState.drawnCard)">You can play it or pass your turn.</span>
+            <span v-else>You cannot play this card. Pass your turn.</span>
+          </BaseAlert>
+          <div class="flex gap-2 justify-center mt-2">
+            <ActionButton v-if="canPlayCard(gameState.drawnCard)" @click="handlePlayDrawnCard">
+              Play Drawn Card
+            </ActionButton>
+            <ActionButton variant="neutral" @click="endTurn">
+              {{ canPlayCard(gameState.drawnCard) ? 'Pass Turn' : 'End Turn' }}
+            </ActionButton>
+          </div>
+        </div>
       </div>
 
       <div class="w-full">
@@ -213,25 +303,33 @@ const handleDrawCard = () => {
 
           <div
             class="flex flex-1 flex-grow justify-center items-center px-2 md:px-4 border-x border-gray-700"
-            :class="{
-              'pointer-events-none': gameState.isComputerThinking,
-            }"
           >
-            <ActionButton v-if="!gameState.isDealt" class="text-base md:text-xl" @click="dealCards">
-              Deal Cards
-            </ActionButton>
-
-            <div v-else class="flex gap-2 md:gap-3">
+            <div v-if="gameState.isDealt && isPlayerTurn" class="flex gap-2 md:gap-3">
               <ActionButton
                 class="text-base md:text-xl"
-                :disabled="!isPlayerTurn"
+                :disabled="!canDrawCard"
                 @click="handleDrawCard"
               >
-                Draw Card
+                {{ getDrawButtonText() }}
               </ActionButton>
-              <ActionButton class="text-base md:text-xl" :disabled="!isPlayerTurn" @click="endTurn">
-                Pass Turn
+              <ActionButton
+                class="text-base md:text-xl"
+                :disabled="!isPlayerTurn || gameState.isComputerThinking"
+                @click="endTurn"
+              >
+                {{ getPassButtonText() }}
               </ActionButton>
+            </div>
+            <div class="text-center">
+              <div v-if="!gameState.isDealt" class="text-lg font-semibold text-blue-400">
+                Dealing Cards...
+              </div>
+              <div
+                v-else-if="gameState.isComputerThinking"
+                class="text-lg font-semibold text-yellow-400"
+              >
+                Computer is thinking...
+              </div>
             </div>
           </div>
 
@@ -247,7 +345,7 @@ const handleDrawCard = () => {
 
     <div
       v-if="gameState.isGameOver"
-      class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
     >
       <div class="bg-white text-black rounded-xl p-8 text-center max-w-md mx-4">
         <h2 class="text-3xl font-bold mb-4">
@@ -261,8 +359,8 @@ const handleDrawCard = () => {
     </div>
   </main>
 </template>
+
 <style>
-/* Add these to your global CSS or Tailwind config */
 .bg-uno-red {
   background-color: #e53e3e;
 }
