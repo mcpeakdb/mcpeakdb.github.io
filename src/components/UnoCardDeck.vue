@@ -69,7 +69,7 @@ const handleClick = () => {
       />
     </div>
 
-    <div v-if="showCount" class="text-white text-sm mt-2 font-medium text-center">
+    <div v-if="showCount" class="text-sm mt-2 font-medium text-center">
       <div>Draw Pile</div>
       <div v-if="cardsRemaining > 0" class="text-xs opacity-75">{{ cardsRemaining }} cards</div>
     </div>

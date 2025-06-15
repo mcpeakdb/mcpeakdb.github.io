@@ -23,6 +23,11 @@ interface GameState {
   playerJustDrewCard: boolean;
   drawnCard: UnoCard | null;
   playerCanDraw: boolean;
+  playerSaidUno: boolean;
+  computerSaidUno: boolean;
+  playerMustSayUno: boolean;
+  computerMustSayUno: boolean;
+  skipNextPlayer: boolean;
 }
 
 const gameState = reactive<GameState>({
@@ -36,6 +41,11 @@ const gameState = reactive<GameState>({
   playerJustDrewCard: false,
   drawnCard: null,
   playerCanDraw: true,
+  playerSaidUno: false,
+  computerSaidUno: false,
+  playerMustSayUno: false,
+  computerMustSayUno: false,
+  skipNextPlayer: false,
 });
 
 const playerHand = ref<UnoCard[]>([]);
@@ -52,14 +62,27 @@ const didPlayerWin = computed(() => {
   return gameState.isGameOver && playerHand.value.length === 0;
 });
 
-const canDrawCard = computed(() => {
+const mustDrawCard = computed(() => {
   return (
     isPlayerTurn.value &&
     gameState.isDealt &&
     !gameState.isGameOver &&
     !gameState.isComputerThinking &&
-    gameState.playerCanDraw &&
-    !gameState.playerJustDrewCard
+    !gameState.playerJustDrewCard &&
+    !hasPlayableCard(playerHand.value) &&
+    gameState.playerCanDraw
+  );
+});
+
+const canDrawCard = computed(() => {
+  return (
+    (isPlayerTurn.value &&
+      gameState.isDealt &&
+      !gameState.isGameOver &&
+      !gameState.isComputerThinking &&
+      gameState.playerCanDraw &&
+      !gameState.playerJustDrewCard) ||
+    mustDrawCard.value
   );
 });
 
@@ -94,9 +117,9 @@ const createDeck = (): UnoCard[] => {
 
     // Action cards (2 of each per color)
     const actionCards = [
-      { value: 10, text: 'Skip', action: 'skip' as const },
-      { value: 11, text: 'Reverse', action: 'reverse' as const },
-      { value: 12, text: '+2', action: 'draw2' as const },
+      { value: 20, text: 'Skip', action: 'skip' as const },
+      { value: 20, text: 'Reverse', action: 'reverse' as const },
+      { value: 20, text: '+2', action: 'draw2' as const },
     ];
 
     actionCards.forEach((actionCard) => {
@@ -119,7 +142,7 @@ const createDeck = (): UnoCard[] => {
     cards.push({
       id: `wild-${i}`,
       suit: 'wild',
-      value: 13,
+      value: 50,
       text: 'Wild',
       isWild: true,
       isActionCard: true,
@@ -128,7 +151,7 @@ const createDeck = (): UnoCard[] => {
     cards.push({
       id: `wild-draw4-${i}`,
       suit: 'wild',
-      value: 14,
+      value: 50,
       text: '+4',
       isWild: true,
       isActionCard: true,
@@ -163,6 +186,11 @@ const initializeGame = () => {
   gameState.drawnCard = null;
   gameState.playerCanDraw = true;
   gameState.isComputerThinking = false;
+  gameState.playerSaidUno = false;
+  gameState.computerSaidUno = false;
+  gameState.playerMustSayUno = false;
+  gameState.computerMustSayUno = false;
+  gameState.skipNextPlayer = false;
 
   // Automatically deal cards
   setTimeout(() => {
@@ -181,21 +209,64 @@ const dealCards = () => {
     }
   }
 
-  // Find first non-action card for initial discard
+  // Handle first card from discard pile
   let firstCard;
   do {
     if (deck.value.length === 0) {
-      // If we run out of cards, reshuffle (shouldn't happen normally)
       deck.value = shuffleDeck(createDeck());
     }
     firstCard = deck.value.pop()!;
-  } while (firstCard.isWild || firstCard.isActionCard);
+
+    // If it's a Wild Draw Four, return to deck and reshuffle
+    if (firstCard.action === 'wild-draw4') {
+      deck.value.push(firstCard);
+      deck.value = shuffleDeck(deck.value);
+      continue;
+    }
+
+    break;
+  } while (true);
 
   discardPile.value.push(firstCard);
   currentCard.value = firstCard;
-  currentColor.value = firstCard.suit as 'red' | 'green' | 'blue' | 'yellow';
+
+  // Handle special first cards
+  if (firstCard.isWild) {
+    // First player chooses color for Wild card
+    const colors: Array<'red' | 'green' | 'blue' | 'yellow'> = ['red', 'green', 'blue', 'yellow'];
+    currentColor.value = colors[Math.floor(Math.random() * colors.length)];
+  } else {
+    currentColor.value = firstCard.suit as 'red' | 'green' | 'blue' | 'yellow';
+  }
+
+  // Apply first card action
+  if (firstCard.isActionCard && !firstCard.isWild) {
+    handleFirstCardAction(firstCard);
+  }
+
   gameState.isDealt = true;
   gameState.playerCanDraw = true;
+};
+
+const handleFirstCardAction = (card: UnoCard) => {
+  switch (card.action) {
+    case 'skip':
+      // First player loses turn
+      isPlayerTurn.value = false;
+      setTimeout(computerTurn, 1000);
+      break;
+    case 'reverse':
+      // In 2-player game, first player loses turn (same as skip)
+      isPlayerTurn.value = false;
+      setTimeout(computerTurn, 1000);
+      break;
+    case 'draw2':
+      // First player draws 2 and loses turn
+      drawCardsForPlayer(playerHand.value, 2);
+      isPlayerTurn.value = false;
+      setTimeout(computerTurn, 1000);
+      break;
+  }
 };
 
 const canPlayCard = (card: UnoCard): boolean => {
@@ -208,22 +279,56 @@ const hasPlayableCard = (hand: UnoCard[]): boolean => {
   return hand.some((card) => canPlayCard(card));
 };
 
+const checkUnoCall = (hand: UnoCard[], isPlayer: boolean) => {
+  if (hand.length === 1) {
+    if (isPlayer) {
+      gameState.playerMustSayUno = true;
+    } else {
+      gameState.computerMustSayUno = true;
+      // Computer automatically says UNO
+      gameState.computerSaidUno = true;
+    }
+  }
+};
+
+const sayUno = () => {
+  if (gameState.playerMustSayUno) {
+    gameState.playerSaidUno = true;
+    gameState.playerMustSayUno = false;
+  }
+};
+
+const catchUnoViolation = () => {
+  if (gameState.playerMustSayUno && !gameState.playerSaidUno) {
+    // Player forgot to say UNO, draw 2 penalty cards
+    drawCardsForPlayer(playerHand.value, 2);
+    gameState.playerMustSayUno = false;
+    return true;
+  }
+  return false;
+};
+
 const handleActionCard = (card: UnoCard, playedByPlayer: boolean) => {
   switch (card.action) {
     case 'skip':
+      // In 2-player game, skip means current player gets another turn
+      gameState.skipNextPlayer = true;
+      break;
     case 'reverse':
-      // In 2-player game, skip and reverse both mean current player gets another turn
-      // No additional logic needed, turn won't switch
+      // In 2-player game, reverse means current player gets another turn
+      gameState.skipNextPlayer = true;
       break;
     case 'draw2':
       // Make opponent draw 2 cards and skip their turn
       const targetHand = playedByPlayer ? computerHand.value : playerHand.value;
       drawCardsForPlayer(targetHand, 2);
+      gameState.skipNextPlayer = true;
       break;
     case 'wild-draw4':
       // Make opponent draw 4 cards and skip their turn
       const targetHandWild = playedByPlayer ? computerHand.value : playerHand.value;
       drawCardsForPlayer(targetHandWild, 4);
+      gameState.skipNextPlayer = true;
       break;
   }
 };
@@ -250,6 +355,9 @@ const playCard = (cardIndex: number) => {
   const card = playerHand.value[cardIndex];
   if (!canPlayCard(card)) return;
 
+  // Check UNO violation before playing
+  catchUnoViolation();
+
   // Remove card from player's hand
   playerHand.value.splice(cardIndex, 1);
 
@@ -261,11 +369,15 @@ const playCard = (cardIndex: number) => {
   gameState.playerJustDrewCard = false;
   gameState.drawnCard = null;
   gameState.playerCanDraw = true;
+  gameState.playerSaidUno = false;
 
   // Update current color (will be set by wild color picker for wild cards)
   if (!card.isWild) {
     currentColor.value = card.suit as 'red' | 'green' | 'blue' | 'yellow';
   }
+
+  // Check for UNO call requirement
+  checkUnoCall(playerHand.value, true);
 
   // Check for win condition
   if (playerHand.value.length === 0) {
@@ -274,13 +386,13 @@ const playCard = (cardIndex: number) => {
   }
 
   // Handle action cards
-  if (card.isActionCard && (card.action === 'skip' || card.action === 'reverse')) {
-    // Player gets another turn
+  if (card.isActionCard) {
     handleActionCard(card, true);
-    return;
-  } else if (card.isActionCard) {
-    // Draw cards affect opponent, then player's turn ends
-    handleActionCard(card, true);
+    if (gameState.skipNextPlayer) {
+      // Player gets another turn
+      gameState.skipNextPlayer = false;
+      return;
+    }
   }
 
   // End player's turn
@@ -289,7 +401,6 @@ const playCard = (cardIndex: number) => {
 };
 
 const drawCard = () => {
-  // Only allow drawing if conditions are met
   if (!canDrawCard.value) return;
 
   if (deck.value.length === 0) {
@@ -300,16 +411,15 @@ const drawCard = () => {
     const drawnCard = deck.value.pop()!;
     playerHand.value.push(drawnCard);
 
-    // Player can no longer draw this turn
     gameState.playerCanDraw = false;
 
     // Check if drawn card can be played
     if (canPlayCard(drawnCard)) {
       gameState.playerJustDrewCard = true;
       gameState.drawnCard = drawnCard;
-      // Player can choose to play the drawn card or pass
+      // Player can choose to play it or end turn manually - no auto timeout
     } else {
-      // Can't play drawn card, turn ends automatically
+      // Can't play drawn card, turn ends automatically after a brief delay
       setTimeout(() => {
         endTurn();
       }, 1000);
@@ -474,15 +584,6 @@ const endTurn = () => {
   }
 };
 
-const playDrawnCard = () => {
-  if (gameState.drawnCard && gameState.playerJustDrewCard) {
-    const cardIndex = playerHand.value.findIndex((card) => card.id === gameState.drawnCard!.id);
-    if (cardIndex !== -1) {
-      playCard(cardIndex);
-    }
-  }
-};
-
 const reset = () => {
   initializeGame();
 };
@@ -501,6 +602,7 @@ export default {
   didPlayerWin,
   cardBack,
   tableTheme,
+  mustDrawCard,
   initializeGame,
   dealCards,
   playCard,
@@ -508,5 +610,5 @@ export default {
   endTurn,
   reset,
   setWildColor,
-  playDrawnCard,
+  sayUno,
 };

@@ -22,6 +22,7 @@ const {
   isPlayerTurn,
   canPlayCard,
   canDrawCard,
+  mustDrawCard,
   didPlayerWin,
   cardBack,
   tableTheme,
@@ -31,7 +32,7 @@ const {
   endTurn,
   reset,
   setWildColor,
-  playDrawnCard,
+  sayUno,
 } = useUno;
 
 onMounted(() => {
@@ -70,6 +71,10 @@ const handleCardPlay = (cardIndex: number) => {
   }
 };
 
+const handleEndTurn = () => {
+  endTurn();
+};
+
 const handleColorChoice = (color: string) => {
   if (gameState.pendingWildCard && gameState.pendingWildCardIndex !== null) {
     setWildColor(color as 'red' | 'green' | 'blue' | 'yellow');
@@ -86,16 +91,22 @@ const handleDrawCard = () => {
   }
 };
 
-const handlePlayDrawnCard = () => {
-  playDrawnCard();
+const handleSayUno = () => {
+  sayUno();
 };
 
 const getCurrentTurnText = () => {
   if (!gameState.isDealt) {
     return 'Dealing cards...';
   }
+  if (mustDrawCard.value) {
+    return 'No playable cards - Must draw!';
+  }
   if (gameState.playerJustDrewCard) {
-    return 'Choose to play drawn card or pass';
+    return 'Play drawn card or turn ends automatically';
+  }
+  if (gameState.playerMustSayUno) {
+    return 'Say UNO! You have one card left!';
   }
   return isPlayerTurn.value ? 'Your Turn' : "Computer's Turn";
 };
@@ -103,6 +114,12 @@ const getCurrentTurnText = () => {
 const getCurrentTurnClass = () => {
   if (!gameState.isDealt) {
     return 'text-blue-400';
+  }
+  if (mustDrawCard.value) {
+    return 'text-red-400';
+  }
+  if (gameState.playerMustSayUno) {
+    return 'text-yellow-400 animate-pulse';
   }
   if (gameState.isComputerThinking) {
     return 'text-yellow-400';
@@ -119,36 +136,20 @@ const drawnCardIndex = computed(() => {
 });
 
 const deckCardsRemaining = computed(() => deck.value.length);
-
-const getDrawButtonText = () => {
-  if (!canDrawCard.value) {
-    if (gameState.playerJustDrewCard) return 'Already Drew';
-    if (gameState.isComputerThinking) return 'Computer Turn';
-    return 'Cannot Draw';
-  }
-  return 'Draw Card';
-};
-
-const getPassButtonText = () => {
-  if (gameState.playerJustDrewCard) {
-    return 'Pass Turn';
-  }
-  return 'Skip Turn';
-};
 </script>
 
 <template>
   <main
     :style="{ height: mainHeight }"
-    class="w-screen overflow-x-hidden fixed inset-0"
-    :class="[{ 'pointer-events-none': gameState.isComputerThinking }, TABLE_THEMES[tableTheme]]"
+    class="w-screen overflow-x-hidden fixed inset-0 bg-black"
+    :class="{ 'pointer-events-none': gameState.isComputerThinking }"
   >
     <div :style="{ height: contentHeight }" class="relative flex flex-col">
-      <div class="w-full flex justify-between items-center p-2">
+      <div class="w-full grid grid-cols-3 justify-between items-center p-2">
         <TopMenu />
 
         <!-- Turn Indicator -->
-        <div class="flex items-center">
+        <div class="flex items-center justify-center">
           <div
             class="px-4 py-2 rounded-lg bg-black/70 backdrop-blur-sm text-white font-bold text-lg text-center"
             :class="getCurrentTurnClass()"
@@ -157,7 +158,9 @@ const getPassButtonText = () => {
           </div>
         </div>
 
-        <ActionButton @click="settingsModal?.setShow(true)">Settings</ActionButton>
+        <div class="flex justify-end">
+          <ActionButton @click="settingsModal?.setShow(true)">Settings</ActionButton>
+        </div>
 
         <SimpleModal ref="settingsModal">
           <h2 class="text-2xl md:text-3xl font-bold mb-4">Game Settings</h2>
@@ -212,7 +215,10 @@ const getPassButtonText = () => {
         </SimpleModal>
       </div>
 
-      <div class="flex-grow flex flex-col items-center justify-center gap-2 my-2">
+      <div
+        class="flex-grow flex flex-col items-center justify-center gap-2 my-2"
+        :class="TABLE_THEMES[tableTheme]"
+      >
         <!-- Computer Hand -->
         <UnoCardHand
           :card-back="cardBack"
@@ -238,7 +244,7 @@ const getPassButtonText = () => {
 
           <!-- Current Color Indicator -->
           <div class="text-center">
-            <div class="text-sm text-white mb-1">Current Color</div>
+            <div class="text-sm mb-1">Current Color</div>
             <div
               class="w-8 h-8 rounded-full border-2 border-white shadow-lg"
               :class="`bg-uno-${currentColor}`"
@@ -247,7 +253,7 @@ const getPassButtonText = () => {
 
           <!-- Discard Pile -->
           <div v-if="currentCard" class="relative">
-            <div class="text-sm text-white mb-1 text-center">Discard Pile</div>
+            <div class="text-sm mb-1 text-center">Discard Pile</div>
             <UnoCardComponent
               :card="currentCard"
               size="md"
@@ -269,20 +275,20 @@ const getPassButtonText = () => {
           @card-clicked="handleCardPlay"
         />
 
+        <!-- UNO Button -->
+        <div v-if="gameState.playerMustSayUno" class="mt-2">
+          <ActionButton
+            class="bg-yellow-600 hover:bg-yellow-700 text-xl font-bold animate-pulse"
+            @click="handleSayUno"
+          >
+            SAY UNO!
+          </ActionButton>
+        </div>
+
         <!-- Drawn Card Action -->
         <div v-if="gameState.playerJustDrewCard && gameState.drawnCard" class="mt-2">
-          <BaseAlert>
-            You drew a {{ gameState.drawnCard.text }}!
-            <span v-if="canPlayCard(gameState.drawnCard)">You can play it or pass your turn.</span>
-            <span v-else>You cannot play this card. Pass your turn.</span>
-          </BaseAlert>
-          <div class="flex gap-2 justify-center mt-2">
-            <ActionButton v-if="canPlayCard(gameState.drawnCard)" @click="handlePlayDrawnCard">
-              Play Drawn Card
-            </ActionButton>
-            <ActionButton variant="neutral" @click="endTurn">
-              {{ canPlayCard(gameState.drawnCard) ? 'Pass Turn' : 'End Turn' }}
-            </ActionButton>
+          <div v-if="canPlayCard(gameState.drawnCard)" class="flex gap-2 justify-center mt-2">
+            <ActionButton variant="neutral" @click="handleEndTurn"> End Turn </ActionButton>
           </div>
         </div>
       </div>
@@ -294,7 +300,7 @@ const getPassButtonText = () => {
         </div>
 
         <div
-          class="flex justify-between bg-black/90 backdrop-blur-sm p-3 md:p-4 pt-4 md:pt-5 rounded-t-2xl text-white shadow-lg"
+          class="flex justify-between bg-black/90 backdrop-blur-sm p-3 md:p-4 pt-4 md:pt-5 rounded-t-2xl shadow-lg"
         >
           <div class="flex-1 flex-grow text-center">
             <div class="text-sm md:text-lg uppercase tracking-wider text-gray-400">Your Cards</div>
@@ -304,22 +310,6 @@ const getPassButtonText = () => {
           <div
             class="flex flex-1 flex-grow justify-center items-center px-2 md:px-4 border-x border-gray-700"
           >
-            <div v-if="gameState.isDealt && isPlayerTurn" class="flex gap-2 md:gap-3">
-              <ActionButton
-                class="text-base md:text-xl"
-                :disabled="!canDrawCard"
-                @click="handleDrawCard"
-              >
-                {{ getDrawButtonText() }}
-              </ActionButton>
-              <ActionButton
-                class="text-base md:text-xl"
-                :disabled="!isPlayerTurn || gameState.isComputerThinking"
-                @click="endTurn"
-              >
-                {{ getPassButtonText() }}
-              </ActionButton>
-            </div>
             <div class="text-center">
               <div v-if="!gameState.isDealt" class="text-lg font-semibold text-blue-400">
                 Dealing Cards...
@@ -329,6 +319,21 @@ const getPassButtonText = () => {
                 class="text-lg font-semibold text-yellow-400"
               >
                 Computer is thinking...
+              </div>
+              <div v-else-if="mustDrawCard" class="text-lg font-semibold text-red-400">
+                No playable cards - Must draw!
+              </div>
+              <div
+                v-else-if="gameState.playerMustSayUno"
+                class="text-lg font-semibold text-yellow-400 animate-pulse"
+              >
+                Say UNO! One card left!
+              </div>
+              <div
+                v-else-if="gameState.playerJustDrewCard"
+                class="text-lg font-semibold text-orange-400"
+              >
+                Play drawn card or turn ends automatically
               </div>
             </div>
           </div>

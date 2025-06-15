@@ -47,8 +47,8 @@ const stand = () => {
 
 <template>
   <main
-    class="w-screen h-screen overflow-x-hidden flex flex-col"
-    :class="[{ 'pointer-events-none': gameState.isComputerThinking }, TABLE_THEMES[tableTheme]]"
+    class="w-screen h-screen overflow-x-hidden flex flex-col bg-black"
+    :class="{ 'pointer-events-none': gameState.isComputerThinking }"
   >
     <div class="w-full flex justify-between p-2 sticky top-0 z-50 bg-inherit">
       <TopMenu />
@@ -114,7 +114,10 @@ const stand = () => {
       </SimpleModal>
     </div>
 
-    <div class="flex-grow flex flex-col items-center justify-center gap-2 p-2">
+    <div
+      class="flex-grow flex flex-col items-center justify-center gap-2 p-8 rotate-x-[30deg] scale-125 w-3/4 md:w-1/2 mx-auto my-16 rounded-2xl"
+      :class="TABLE_THEMES[tableTheme]"
+    >
       <StandardCardHand
         :card-back="cardBack"
         :hand="computerHand"
@@ -122,13 +125,13 @@ const stand = () => {
         size="md"
         orientation="horizontal"
         :is-interactive="false"
+        class="transform-3d"
       />
       <StandardCardDeck
         :card-back="cardBack"
         size="md"
         :show-count="false"
-        :auto-build="false"
-        class="mt-2.5 mb-1.5"
+        class="mt-2.5 mb-1.5 transform-3d"
       />
 
       <StandardCardHand
@@ -137,15 +140,16 @@ const stand = () => {
         :visible="-1"
         size="md"
         orientation="horizontal"
+        class="transform-3d"
       />
-    </div>
 
-    <div class="w-full sticky bottom-0 left-0 z-50">
-      <div v-if="gameState.isGameOver" class="flex justify-center m-2">
+      <div v-if="gameState.isGameOver" class="absolute w-full bottom-0 m-8 flex justify-center">
         <BaseAlert v-if="didPlayerWin"> 🎉 VICTORY! 🎉 </BaseAlert>
         <BaseAlert v-else variant="danger"> 💀 GAME OVER 💀 </BaseAlert>
       </div>
+    </div>
 
+    <div class="w-full sticky bottom-0 left-0 z-50">
       <div
         class="flex justify-between bg-black/90 backdrop-blur-sm p-3 md:p-4 pt-4 md:pt-5 rounded-t-2xl text-white shadow-lg"
       >
@@ -191,3 +195,8 @@ const stand = () => {
     </div>
   </main>
 </template>
+<style scoped>
+.transform-3d {
+  transform-style: preserve-3d;
+}
+</style>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import type { UnoCard } from '@/composables/useUno';
 import UnoCardComponent from './UnoCard.vue';
 
@@ -37,20 +36,12 @@ const handleCardClick = (index: number) => {
     emit('cardClicked', index);
   }
 };
-
-const getCardSpacing = computed(() => {
-  const baseSpacing = 'gap-1';
-  if (props.hand.length > 10) return 'gap-0.5 -space-x-2';
-  if (props.hand.length > 7) return 'gap-0.5 -space-x-1';
-  return baseSpacing;
-});
 </script>
 
 <template>
   <div
     :class="[
-      'flex',
-      getCardSpacing,
+      'flex gap-1',
       orientation === 'vertical' ? 'flex-col' : 'flex-row flex-wrap justify-center',
     ]"
   >

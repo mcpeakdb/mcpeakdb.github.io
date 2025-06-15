@@ -5,15 +5,11 @@ import { CARD_SIZES, type CardSize } from '@/constants/cardStyles';
 interface Props {
   size?: CardSize;
   variant?: 'dashed' | 'solid' | 'dotted';
-  message?: string;
-  icon?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   size: 'md',
   variant: 'dashed',
-  message: 'No cards',
-  icon: '🃏',
 });
 
 const cardClasses = computed(() => {
@@ -25,7 +21,7 @@ const cardClasses = computed(() => {
   };
 
   return [
-    'flex flex-col items-center justify-center text-center text-gray-500 rounded-lg bg-gray-50',
+    'flex flex-col items-center justify-center text-center text-gray-500 rounded-lg',
     sizeConfig.width,
     sizeConfig.height,
     sizeConfig.text,
@@ -36,8 +32,6 @@ const cardClasses = computed(() => {
 
 <template>
   <div :class="cardClasses">
-    <div class="text-2xl mb-1">{{ icon }}</div>
-    <div class="text-xs">{{ message }}</div>
     <slot></slot>
   </div>
 </template>

@@ -147,10 +147,11 @@ const handleCardClick = (card: StandardCard | undefined) => {
     :size="size"
     :show-flip-animation="showAnimation"
     :card="card"
+    :custom-class="'card-3d'"
     @click="handleCardClick"
   >
     <template #front>
-      <div class="bg-white w-full h-full p-2 relative" :class="cardClasses">
+      <div class="bg-white w-full h-full p-2 relative card-face" :class="cardClasses">
         <!-- Corner numbers -->
         <CornerNumber :card="card" position="top-left" :size="size === 'sm' ? 'xs' : 'sm'" />
         <CornerNumber :card="card" position="bottom-right" :size="size === 'sm' ? 'xs' : 'sm'" />
@@ -158,7 +159,7 @@ const handleCardClick = (card: StandardCard | undefined) => {
         <!-- Card content -->
         <div class="absolute inset-4 flex items-center justify-center">
           <!-- Face cards -->
-          <div v-if="isFaceCard" class="text-6xl text-jacquard-24">
+          <div v-if="isFaceCard" class="text-6xl text-jacquard-24 card-symbol">
             {{ card.text }}
           </div>
 
@@ -167,6 +168,7 @@ const handleCardClick = (card: StandardCard | undefined) => {
             v-else-if="isAce"
             :suit="card.suit"
             :size="card.suit === 'spade' ? 'xl' : 'lg'"
+            class="card-symbol"
           />
 
           <!-- Number cards -->
@@ -176,7 +178,7 @@ const handleCardClick = (card: StandardCard | undefined) => {
               :key="`suit-${index}`"
               :suit="card.suit"
               size="md"
-              :class="['absolute', position.class, { 'rotate-180': position.rotated }]"
+              :class="['absolute card-symbol', position.class, { 'rotate-180': position.rotated }]"
             />
           </div>
         </div>
@@ -186,19 +188,55 @@ const handleCardClick = (card: StandardCard | undefined) => {
     <template #back>
       <div
         v-if="cardBack === 'uno'"
-        class="w-full h-full relative rounded-lg shadow-lg overflow-hidden bg-black"
+        class="w-full h-full relative rounded-lg shadow-lg overflow-hidden bg-black card-face"
       >
         <!-- Red Oval -->
         <div class="absolute inset-0 flex justify-center items-center">
           <div class="w-[75%] h-full rounded-[100%] bg-red-600 transform rotate-45 scale-110"></div>
         </div>
 
-        <!-- UNO Text (replace with image or logo if needed) -->
+        <!-- UNO Text -->
         <div class="absolute inset-0 flex justify-center items-center">
           <span class="text-xl font-extrabold italic text-yellow-300 drop-shadow-lg">UNO</span>
         </div>
       </div>
-      <div v-else class="w-full h-full" :class="CARD_BACKS[cardBack]"></div>
+      <div v-else class="w-full h-full card-face" :class="CARD_BACKS[cardBack]"></div>
     </template>
   </BaseCard>
 </template>
+
+<style scoped>
+.card-3d {
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-3d:hover {
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.35));
+}
+
+.card-face {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.card-symbol {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Enhanced flip animation */
+.card-flip-enter-active,
+.card-flip-leave-active {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-flip-enter-from {
+  transform: rotateY(-90deg) translateZ(-10px);
+}
+
+.card-flip-leave-to {
+  transform: rotateY(90deg) translateZ(-10px);
+}
+</style>

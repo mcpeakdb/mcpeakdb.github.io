@@ -75,8 +75,9 @@ watch(
 );
 
 const deckClasses = computed(() => [
-  'relative transition-transform hover:scale-105',
+  'relative transition-all duration-300 hover:scale-105',
   'min-w-24 min-h-40 w-24 h-40',
+  'deck-3d',
   {
     'cursor-pointer': visibleCards.value.length > 0 && props.isInteractive && !isAnimating.value,
     'cursor-not-allowed opacity-50': visibleCards.value.length === 0,
@@ -98,7 +99,7 @@ const handleCardClick = (card: StandardCardType) => {
 
 <template>
   <div class="flex flex-col items-center gap-2">
-    <div :class="deckClasses" @click="handleDeckClick">
+    <div :class="deckClasses" style="transform-style: preserve-3d" @click="handleDeckClick">
       <TransitionGroup name="deck-card" tag="div" class="relative w-full h-full">
         <NoCard
           v-if="visibleCards.length === 0"
@@ -115,8 +116,8 @@ const handleCardClick = (card: StandardCardType) => {
           :card-back="cardBack"
           :is-interactive="isInteractive && !isAnimating"
           :style="{
-            zIndex: index,
-            transform: `translateY(-${index * 2}px)`,
+            zIndex: index + 1,
+            transform: `translateY(-${index * 3}px) translateZ(${index * 4}px) rotateX(-2deg)`,
             opacity: isAnimating ? 0.8 : 1,
           }"
           class="absolute inset-0 deck-card"
@@ -133,31 +134,41 @@ const handleCardClick = (card: StandardCardType) => {
 </template>
 
 <style scoped>
+.deck-3d {
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+}
+
+.deck-3d:hover {
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+  transform: translateZ(10px) rotateX(-5deg);
+}
+
+.deck-card {
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
 .deck-card-enter-active {
-  transition: all 0.5s ease-out;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .deck-card-leave-active {
-  transition: all 0.4s ease-in;
+  transition: all 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53);
 }
 
 .deck-card-enter-from {
   opacity: 0;
-  transform: translateX(100px) rotate(-30deg) scale(0.8);
+  transform: translateX(100px) rotateY(-45deg) translateZ(-30px) scale(0.8);
 }
 
 .deck-card-leave-to {
   opacity: 0;
-  transform: translateX(-100vw) rotate(-30deg) scale(1.2);
+  transform: translateX(-100vw) rotateY(-45deg) translateZ(50px) scale(1.2);
 }
 
 .deck-empty.deck-card-enter-from,
 .deck-empty.deck-card-leave-to {
   transform: none;
-}
-
-/* Smooth transition for opacity changes during animation */
-.deck-card {
-  transition: opacity 0.2s ease;
 }
 </style>

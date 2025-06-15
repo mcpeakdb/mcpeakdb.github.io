@@ -46,7 +46,7 @@ const handClasses = computed(() => [
 
 const getCardStyle = (index: number) => {
   return {
-    zIndex: index,
+    zIndex: index + 10,
 
     marginLeft:
       index > 0 && props.orientation === 'horizontal' ? `-${props.overlapDistance}px` : undefined,
@@ -78,7 +78,7 @@ const handleHandClick = () => {
 <template>
   <div class="flex flex-col items-center gap-2">
     <div v-if="hand.length > 0" :class="handClasses" @click="handleHandClick">
-      <TransitionGroup name="hand-card" tag="div" class="flex">
+      <TransitionGroup name="hand-card" tag="div" class="flex" style="transform-style: preserve-3d">
         <StandardCard
           v-for="(card, index) in hand"
           :key="`hand-${card.id}`"
@@ -89,7 +89,7 @@ const handleHandClick = () => {
           :is-interactive="isInteractive"
           :is-selected="isCardSelected(card)"
           :style="getCardStyle(index)"
-          class="hand-card transition-transform duration-200 hover:-translate-y-2 hover:z-50"
+          class="hand-card transition-all duration-300 hover:scale-105 hover:translateZ-20"
           @click="() => handleCardClick(card, index)"
         />
       </TransitionGroup>
@@ -102,20 +102,27 @@ const handleHandClick = () => {
 <style scoped>
 .hand-card-enter-active,
 .hand-card-leave-active {
-  transition: all 0.5s ease;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .hand-card-enter-from {
   opacity: 0;
-  transform: translateX(100vw) rotate(-30deg);
+  transform: translateX(100vw) rotateY(-90deg) translateZ(100px);
 }
 
 .hand-card-leave-to {
   opacity: 0;
-  transform: translateY(-200px) rotate(360deg);
+  transform: translateY(-200px) rotateX(90deg) translateZ(100px);
+}
+
+.hand-card {
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
 }
 
 .hand-card:hover {
   z-index: 999 !important;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4));
+  transform: translateZ(20px) scale(1.05) !important;
 }
 </style>
