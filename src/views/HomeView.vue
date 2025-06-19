@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ActionButton from '@/components/Layout/Buttons/ActionButton.vue';
-import CardSuit from '@/components/CardSuit.vue';
+import CardSuit from '@/components/StandardCard/CardSuit.vue';
 import UnoSymbol from '@/components/UnoCard/UnoSymbol.vue';
 </script>
 

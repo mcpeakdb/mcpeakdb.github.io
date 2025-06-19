@@ -4,7 +4,7 @@ import useStandardDeck from '@/composables/useStandardDeck';
 import { type CardSize, type CardBack } from '@/constants/cardStyles';
 import { type StandardCard as StandardCardType } from '@/types/cards';
 import StandardCard from './StandardCard.vue';
-import NoCard from './NoCard.vue';
+import NoCard from '../NoCard.vue';
 
 interface Props {
   size?: CardSize;

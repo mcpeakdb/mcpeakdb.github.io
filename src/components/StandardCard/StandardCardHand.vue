@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { type StandardCard as StandardCardType } from '@/types/cards';
 import { type CardBack, type CardSize } from '@/constants/cardStyles';
 import StandardCard from './StandardCard.vue';
-import NoCard from './NoCard.vue';
+import NoCard from '../NoCard.vue';
 
 interface Props {
   hand: StandardCardType[];

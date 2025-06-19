@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from 'vue';
 import useUno from '@/composables/useUno';
-import UnoCardDeck from '@/components/UnoCardDeck.vue';
-import UnoCardHand from '@/components/UnoCardHand.vue';
-import UnoCardComponent from '@/components/UnoCard.vue';
+import UnoCardDeck from '@/components/UnoCard/UnoCardDeck.vue';
+import UnoCardHand from '@/components/UnoCard/UnoCardHand.vue';
+import UnoCardComponent from '@/components/UnoCard/UnoCard.vue';
 import ActionButton from '@/components/Layout/Buttons/ActionButton.vue';
 import TopMenu from '@/components/Layout/TopMenu.vue';
 import BaseAlert from '@/components/Layout/Alerts/BaseAlert.vue';
 import { CARD_BACKS } from '@/constants/cardStyles';
 import { TABLE_THEMES } from '@/constants/tableThemes';
 import SimpleModal from '@/components/Layout/SimpleModal.vue';
-import UnoColorPicker from '@/components/UnoColorPicker.vue';
+import UnoColorPicker from '@/components/UnoCard/UnoColorPicker.vue';
 
 const {
   gameState,

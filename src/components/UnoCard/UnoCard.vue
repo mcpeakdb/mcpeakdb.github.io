@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import BaseCard from './BaseCard.vue';
+import BaseCard from '../BaseCard.vue';
 import type { UnoCard as UnoCardType } from '@/composables/useUno';
 import { CARD_BACKS } from '@/constants/cardStyles';
 import type { CardSize } from '@/constants/cardStyles';

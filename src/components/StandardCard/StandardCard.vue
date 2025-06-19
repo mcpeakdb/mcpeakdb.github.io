@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { type StandardCard, SUIT_COLORS } from '@/types/cards';
 import { CARD_BACKS, type CardSize, type CardBack } from '@/constants/cardStyles';
-import BaseCard from './BaseCard.vue';
+import BaseCard from '../BaseCard.vue';
 import CardSuit from './CardSuit.vue';
 import CornerNumber from './CornerNumber.vue';
 

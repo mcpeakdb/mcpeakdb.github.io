@@ -2,8 +2,8 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 
 import useBlackjack from '@/composables/useBlackjack';
-import StandardCardDeck from '@/components/StandardCardDeck.vue';
-import StandardCardHand from '@/components/StandardCardHand.vue';
+import StandardCardDeck from '@/components/StandardCard/StandardCardDeck.vue';
+import StandardCardHand from '@/components/StandardCard/StandardCardHand.vue';
 import ActionButton from '@/components/Layout/Buttons/ActionButton.vue';
 import TopMenu from '@/components/Layout/TopMenu.vue';
 import BaseAlert from '@/components/Layout/Alerts/BaseAlert.vue';
@@ -50,7 +50,7 @@ const stand = () => {
     class="w-screen h-screen overflow-x-hidden flex flex-col bg-black"
     :class="{ 'pointer-events-none': gameState.isComputerThinking }"
   >
-    <div class="w-full flex justify-between p-2 sticky top-0 z-50 bg-inherit">
+    <div class="w-full flex justify-between p-2 fixed top-0 z-50 bg-inherit">
       <TopMenu />
       <ActionButton @click="settingsModal?.setShow(true)">Settings</ActionButton>
       <SimpleModal ref="settingsModal">
@@ -115,82 +115,89 @@ const stand = () => {
     </div>
 
     <div
-      class="flex-grow flex flex-col items-center justify-center gap-2 p-8 rotate-x-[30deg] scale-125 w-3/4 md:w-1/2 mx-auto my-16 rounded-2xl"
+      class="h-[80vh] flex-grow flex grande:flex-col items-start grande:items-center justify-center gap-2 p-8 rotate-x-[30deg] scale-125 w-3/4 lg:w-1/2 mx-auto my-16 rounded-2xl mt-24"
       :class="TABLE_THEMES[tableTheme]"
     >
-      <StandardCardHand
-        :card-back="cardBack"
-        :hand="computerHand"
-        :visible="gameState.showComputerHand ? -1 : 1"
-        size="md"
-        orientation="horizontal"
-        :is-interactive="false"
-        class="transform-3d"
-      />
-      <StandardCardDeck
-        :card-back="cardBack"
-        size="md"
-        :show-count="false"
-        class="mt-2.5 mb-1.5 transform-3d"
-      />
-
-      <StandardCardHand
-        :card-back="cardBack"
-        :hand="playerHand"
-        :visible="-1"
-        size="md"
-        orientation="horizontal"
-        class="transform-3d"
-      />
-
-      <div v-if="gameState.isGameOver" class="absolute w-full bottom-0 m-8 flex justify-center">
-        <BaseAlert v-if="didPlayerWin"> 🎉 VICTORY! 🎉 </BaseAlert>
-        <BaseAlert v-else variant="danger"> 💀 GAME OVER 💀 </BaseAlert>
+      <div class="flex gap-2">
+        <StandardCardDeck
+          :card-back="cardBack"
+          :show-count="false"
+          class="mt-2.5 mb-1.5 transform-3d"
+        />
+        <StandardCardHand
+          :card-back="cardBack"
+          :hand="computerHand"
+          :visible="gameState.showComputerHand ? -1 : 1"
+          orientation="horizontal"
+          :is-interactive="false"
+          class="transform-3d"
+        />
       </div>
-    </div>
 
-    <div class="w-full sticky bottom-0 left-0 z-50">
       <div
-        class="flex justify-between bg-black/90 backdrop-blur-sm p-3 md:p-4 pt-4 md:pt-5 rounded-t-2xl text-white shadow-lg"
+        class="relative flex gap-2"
+        :class="{
+          'pointer-events-none': gameState.isComputerThinking,
+        }"
       >
-        <div class="flex-1 flex-grow text-center">
-          <div class="text-sm md:text-lg uppercase tracking-wider text-gray-400">Your Hand</div>
-          <div class="text-2xl md:text-3xl font-bold">{{ playerHandTotal }}</div>
-        </div>
+        <StandardCardHand
+          :card-back="cardBack"
+          :hand="playerHand"
+          :visible="-1"
+          orientation="horizontal"
+          class="transform-3d"
+        />
+      </div>
 
+      <div class="flex-1 flex-grow text-center absolute bottom-0 left-0 mx-2 tall:my-2">
+        <div class="text-sm md:text-lg uppercase tracking-wider text-gray-400">Dealer Hand</div>
+        <div class="text-2xl md:text-3xl font-bold">
+          <span v-if="gameState.showComputerHand">{{ computerHandTotal }}</span>
+          <span v-else class="text-yellow-500">??</span>
+        </div>
+      </div>
+
+      <div class="flex-1 flex-grow text-center absolute bottom-0 left-0 right-0 m-2">
         <div
-          class="flex flex-1 flex-grow justify-center items-center px-2 md:px-4 border-x border-gray-700"
+          v-if="gameState.isDealt"
+          class="flex gap-2 justify-center"
           :class="{
             'pointer-events-none': gameState.isComputerThinking,
           }"
         >
-          <ActionButton v-if="!gameState.isDealt" class="text-base md:text-xl" @click="dealHand">
-            Deal
+          <ActionButton class="text-base md:text-xl" @click="hit"> Hit </ActionButton>
+          <ActionButton
+            class="text-base md:text-xl h-full"
+            :class="{
+              'opacity-50 cursor-not-allowed': playerHand.length < 2,
+              'cursor-pointer': playerHand.length >= 2,
+            }"
+            :disabled="playerHand.length < 2"
+            @click="stand"
+          >
+            Stand
           </ActionButton>
-
-          <div v-else class="flex gap-2 md:gap-3">
-            <ActionButton class="text-base md:text-xl" @click="hit"> Hit </ActionButton>
-            <ActionButton
-              class="text-base md:text-xl"
-              :class="{
-                'opacity-50 cursor-not-allowed': playerHand.length < 2,
-                'cursor-pointer': playerHand.length >= 2,
-              }"
-              :disabled="playerHand.length < 2"
-              @click="stand"
-            >
-              Stand
-            </ActionButton>
-          </div>
         </div>
+        <ActionButton
+          v-if="(!gameState.isDealt && playerHand.length === 0) || gameState.isGameOver"
+          class="text-base md:text-xl"
+          @click="dealHand"
+        >
+          Deal
+        </ActionButton>
+      </div>
 
-        <div class="flex-1 flex-grow text-center">
-          <div class="text-sm md:text-lg uppercase tracking-wider text-gray-400">Dealer Hand</div>
-          <div class="text-2xl md:text-3xl font-bold">
-            <span v-if="gameState.showComputerHand">{{ computerHandTotal }}</span>
-            <span v-else class="text-yellow-500">??</span>
-          </div>
-        </div>
+      <div class="flex-1 flex-grow text-center absolute bottom-0 right-0 mx-2 tall:my-2">
+        <div class="text-sm md:text-lg uppercase tracking-wider text-gray-400">Your Hand</div>
+        <div class="text-2xl md:text-3xl font-bold">{{ playerHandTotal }}</div>
+      </div>
+
+      <div
+        v-if="gameState.isGameOver"
+        class="absolute w-full top-0 translate-y-1/2 flex justify-center"
+      >
+        <BaseAlert v-if="didPlayerWin"> 🎉 VICTORY! 🎉 </BaseAlert>
+        <BaseAlert v-else variant="danger"> 💀 GAME OVER 💀 </BaseAlert>
       </div>
     </div>
   </main>
