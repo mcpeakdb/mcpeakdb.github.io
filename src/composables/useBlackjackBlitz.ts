@@ -10,6 +10,7 @@ export interface ModifierCard {
   id?: string;
   description: string;
   effects: Effect[];
+  isActive: boolean;
 }
 
 export interface Effect {
@@ -61,10 +62,12 @@ const blackjack = useBlackjack;
 
 // Modifier card management
 function generateModifierDeck(): ModifierCard[] {
-  return modifierCardsData.map((card, index) => ({
-    ...card,
-    id: `${card.name}-${index}`,
-  })) as ModifierCard[];
+  return modifierCardsData
+    .map((card, index) => ({
+      ...card,
+      id: `${card.name}-${index}`,
+    }))
+    .filter((card) => card.isActive) as ModifierCard[];
 }
 
 function drawModifierCards(count: number = 3): ModifierCard[] {

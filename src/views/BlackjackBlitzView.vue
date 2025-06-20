@@ -420,10 +420,6 @@ const { cardSize } = useResponsiveCardSize();
       <div class="flex-1 flex-grow text-center absolute bottom-0 right-0 mx-2 tall:my-2">
         <div class="text-sm md:text-lg uppercase tracking-wider">Player</div>
         <div class="text-2xl md:text-3xl font-bold">{{ playerHandTotal }}</div>
-        <!-- Player Armor Display -->
-        <div v-if="gameState.playerArmor > 0" class="text-sm text-blue-300 mt-1">
-          🛡️ {{ gameState.playerArmor }}
-        </div>
       </div>
 
       <!-- Game Over Alerts -->
@@ -516,7 +512,7 @@ const { cardSize } = useResponsiveCardSize();
       class="w-full px-4 py-2 bg-gray-900 bg-opacity-50"
     >
       <div class="text-xs text-gray-400 mb-2 text-center">Your Modifier Cards</div>
-      <div class="flex gap-2 justify-center overflow-x-auto">
+      <div class="flex gap-2 justify-center overflow-visible">
         <div
           v-for="card in gameState.playerModifierCards"
           :key="card.id"
@@ -531,12 +527,8 @@ const { cardSize } = useResponsiveCardSize();
         >
           <!-- Armor indicator for armor-related cards -->
           <div
-            v-if="
-              card.name.includes('Armor') ||
-              card.name.includes('Shield') ||
-              card.name.includes('Defense')
-            "
-            class="absolute -top-1 -right-1 text-xs bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center animate-pulse shadow-lg shadow-blue-500/50"
+            v-if="card.effects.find((effect) => effect.effect.includes('armor'))"
+            class="absolute -top-1 -right-1 text-xs bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-blue-500/50"
           >
             🛡️
           </div>
@@ -568,22 +560,8 @@ const { cardSize } = useResponsiveCardSize();
         </span>
         <span v-else-if="gameState.currentPhase === 'modifier-selection'">
           🃏 Round {{ gameState.roundNumber }} - You have
-          {{ gameState.playerModifierCards.length }} modifier cards.
-          <span v-if="gameState.playerArmor > 0" class="text-blue-300"
-            >🛡️ {{ gameState.playerArmor }} armor active!</span
-          >
-          Click "Start Round" to begin!
+          {{ gameState.playerModifierCards.length }} modifier cards. Click "Start Round" to begin!
         </span>
-      </div>
-    </div>
-
-    <!-- Armor Tutorial (Show on first armor gain) -->
-    <div
-      v-if="gameState.playerArmor > 0 && gameState.roundNumber <= 2"
-      class="w-full px-4 py-1 bg-blue-800 bg-opacity-40 text-center animate-pulse"
-    >
-      <div class="text-xs text-blue-200">
-        💡 Armor blocks incoming damage! Each point of armor prevents 1 point of chip damage.
       </div>
     </div>
   </main>

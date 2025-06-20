@@ -1,8 +1,401 @@
 [
   {
+    "name": "Safe Bet",
+    "rarity": "Common",
+    "description": "Draw a card safely without busting if your total is 15 or less."
+  },
+  {
+    "name": "Stack the Deck",
+    "rarity": "Common",
+    "description": "Rearrange the top two cards of the dealer deck to your advantage."
+  },
+  {
+    "name": "Uppercut",
+    "rarity": "Common",
+    "description": "Deal extra damage if your final total is 18 or higher."
+  },
+  {
+    "name": "Soft Stand",
+    "rarity": "Common",
+    "description": "Gain block if you stand with 16 or less."
+  },
+  {
+    "name": "Guard Stance",
+    "rarity": "Common",
+    "description": "Boost your defense for this round."
+  },
+  {
+    "name": "Calculated Risk",
+    "rarity": "Common",
+    "description": "Treat one card as either 1 or 11 for this turn."
+  },
+  {
+    "name": "Feint",
+    "rarity": "Common",
+    "description": "Confuse the opponent and reduce their next hit damage."
+  },
+  {
+    "name": "Swift Jab",
+    "rarity": "Common",
+    "description": "Quickly hit to add a small amount of damage immediately."
+  },
+  {
     "name": "Defensive Draw",
     "rarity": "Common",
     "description": "Draw one card and gain 2 armor.",
-    "effects": [{ "target": "self", "when": "immediately", "effect": "armor_add", "value": 2 }]
+    "effects": [{ "target": "self", "when": "immediately", "effect": "armor_add", "value": 2 }],
+    "isActive": true
+  },
+  {
+    "name": "Low Profile",
+    "rarity": "Common",
+    "description": "Take half damage this round if you stand."
+  },
+  {
+    "name": "Shady Deal",
+    "rarity": "Common",
+    "description": "Swap a card in your hand with one from your opponent\u2019s."
+  },
+  {
+    "name": "Tilt Control",
+    "rarity": "Common",
+    "description": "Set one card\u2019s value to 5 for this turn."
+  },
+  {
+    "name": "Mirror Move",
+    "rarity": "Common",
+    "description": "Copy the next card your opponent plays."
+  },
+  {
+    "name": "Escape Artist",
+    "rarity": "Common",
+    "description": "Avoid all penalties if you lose this round."
+  },
+  {
+    "name": "Redraw Gambit",
+    "rarity": "Common",
+    "description": "Draw two cards and discard one without hitting."
+  },
+  {
+    "name": "Dealer\u2019s Favor",
+    "rarity": "Common",
+    "description": "If your hand total is odd, gain +1 to your next draw."
+  },
+  {
+    "name": "Steady Hand",
+    "rarity": "Common",
+    "description": "Prevent busting if your total is 19 or less."
+  },
+  {
+    "name": "Absorb Hit",
+    "rarity": "Common",
+    "description": "Block the next 10 damage you receive."
+  },
+  {
+    "name": "High Roller",
+    "rarity": "Common",
+    "description": "Draw a card; if its value is 8 or higher, gain +2 bonus damage."
+  },
+  {
+    "name": "Brace",
+    "rarity": "Common",
+    "description": "Take no damage from losing if you played no modifier this turn."
+  },
+  {
+    "name": "Card Counter",
+    "rarity": "Uncommon",
+    "description": "View the next three cards in the dealer deck."
+  },
+  {
+    "name": "Hold Back",
+    "rarity": "Uncommon",
+    "description": "Remove one card from your hand this turn."
+  },
+  {
+    "name": "Fake Stand",
+    "rarity": "Uncommon",
+    "description": "Opponent thinks you stood until round resolves."
+  },
+  {
+    "name": "Dead Man\u2019s Draw",
+    "rarity": "Uncommon",
+    "description": "If you bust, deal damage to both players."
+  },
+  {
+    "name": "Busted Shield",
+    "rarity": "Uncommon",
+    "description": "Gain +2 armor immediately if you bust.",
+    "effects": [{ "target": "self", "when": "on_bust", "effect": "armor_add", "value": 2 }]
+  },
+  {
+    "name": "Follow Through",
+    "rarity": "Uncommon",
+    "description": "Gain +1 bonus attack for each card in your hand."
+  },
+  {
+    "name": "Reactive Guard",
+    "rarity": "Uncommon",
+    "description": "Gain armor equal to cards in your hand.",
+    "effects": [{ "target": "self", "when": "immediately", "effect": "armor_add_hand" }]
+  },
+  {
+    "name": "Risky Business",
+    "rarity": "Uncommon",
+    "description": "Take 2 damage to draw an extra card."
+  },
+  {
+    "name": "Soft Bounce",
+    "rarity": "Uncommon",
+    "description": "First bust this round doesn\u2019t deal self-damage."
+  },
+  {
+    "name": "Ambush",
+    "rarity": "Uncommon",
+    "description": "Opponent takes 2 damage if they hit next."
+  },
+  {
+    "name": "Double Top",
+    "rarity": "Uncommon",
+    "description": "If you draw two cards \u22659, deal +5 damage."
+  },
+  {
+    "name": "Overwhelm",
+    "rarity": "Uncommon",
+    "description": "If you draw 4 or more cards this round, gain +5 attack."
+  },
+  {
+    "name": "Critical Focus",
+    "rarity": "Uncommon",
+    "description": "Deal double damage on 21."
+  },
+  {
+    "name": "Snare Trap",
+    "rarity": "Uncommon",
+    "description": "Opponent takes 4 damage if they draw a card \u22659."
+  },
+  {
+    "name": "Push Limit",
+    "rarity": "Uncommon",
+    "description": "If you bust at 22 or 23, reduce total to 20."
+  },
+  {
+    "name": "Hallucinate",
+    "rarity": "Uncommon",
+    "description": "Opponent sees a fake card value for 1 turn."
+  },
+  {
+    "name": "Copycat",
+    "rarity": "Uncommon",
+    "description": "Copy the opponent's hand value."
+  },
+  {
+    "name": "Twist Fate",
+    "rarity": "Uncommon",
+    "description": "If your opponent wins, they gain no damage benefit."
+  },
+  {
+    "name": "Turn the Tables",
+    "rarity": "Uncommon",
+    "description": "Mirror the opponent\u2019s current hand total."
+  },
+  {
+    "name": "Rattled",
+    "rarity": "Uncommon",
+    "description": "Opponent must hit if their total is between 14 and 17."
+  },
+  {
+    "name": "Counting Ace",
+    "rarity": "Rare",
+    "description": "Aces in your hand count as both 1 and 11 this turn."
+  },
+  {
+    "name": "Sleight of Hand",
+    "rarity": "Rare",
+    "description": "Hide your final total until combat resolves."
+  },
+  {
+    "name": "Sabotage",
+    "rarity": "Rare",
+    "description": "Opponent\u2019s next draw value is reduced by 2."
+  },
+  {
+    "name": "Jester\u2019s Gambit",
+    "rarity": "Rare",
+    "description": "Roll a d20; on 1 or 20, deal 20 damage."
+  },
+  {
+    "name": "Blackjack Lock",
+    "rarity": "Rare",
+    "description": "Neither player can draw cards this round."
+  },
+  {
+    "name": "Emergency Evade",
+    "rarity": "Rare",
+    "description": "Ignore the first bust this game."
+  },
+  {
+    "name": "Triple Twist",
+    "rarity": "Rare",
+    "description": "Pick three cards from dealer deck; keep one."
+  },
+  {
+    "name": "Weighted Deck",
+    "rarity": "Rare",
+    "description": "Top card becomes value 6."
+  },
+  {
+    "name": "Mirror Guard",
+    "rarity": "Rare",
+    "description": "Reflect 50% of damage taken this round."
+  },
+  {
+    "name": "Time Skip",
+    "rarity": "Rare",
+    "description": "Take two turns in a row; skip next round."
+  },
+  {
+    "name": "Sudden Death",
+    "rarity": "Rare",
+    "description": "Opponent loses immediately if they bust with 0 armor."
+  },
+  {
+    "name": "Damage Echo",
+    "rarity": "Rare",
+    "description": "Repeat half your last round\u2019s damage if you hit."
+  },
+  {
+    "name": "Ghost Draw",
+    "rarity": "Rare",
+    "description": "Draw a card that does not count toward your total."
+  },
+  {
+    "name": "Invert Hand",
+    "rarity": "Rare",
+    "description": "Change your hand total to 21 minus your current total."
+  },
+  {
+    "name": "Wild Swing",
+    "rarity": "Rare",
+    "description": "If you bust, deal damage equal to your hand total."
+  },
+  {
+    "name": "Dealer\u2019s Edge",
+    "rarity": "Rare",
+    "description": "Deal +3 damage if dealer\u2019s visible card is 6 or less."
+  },
+  {
+    "name": "Backstab",
+    "rarity": "Rare",
+    "description": "If opponent stands and you don\u2019t, deal +3 damage."
+  },
+  {
+    "name": "Unstable Shot",
+    "rarity": "Rare",
+    "description": "Deal +6 damage but skip your next turn."
+  },
+  {
+    "name": "Dealer\u2019s Debt",
+    "rarity": "Rare",
+    "description": "Force dealer to burn top card of their deck."
+  },
+  {
+    "name": "Wild Card",
+    "rarity": "Epic",
+    "description": "Set a card\u2019s value to a random number between 2 and 11."
+  },
+  {
+    "name": "Lucky Seven",
+    "rarity": "Epic",
+    "description": "Gain +7 damage if your total is exactly 7."
+  },
+  {
+    "name": "Haunted Card",
+    "rarity": "Epic",
+    "description": "One card in hand duplicates itself next turn."
+  },
+  {
+    "name": "Jackpot",
+    "rarity": "Epic",
+    "description": "If you draw a 7 or 11, draw two more cards."
+  },
+  {
+    "name": "Karma Hit",
+    "rarity": "Epic",
+    "description": "If you bust, opponent takes the damage instead."
+  },
+  {
+    "name": "Glass Cannon",
+    "rarity": "Epic",
+    "description": "Double your next attack, but skip defense next round."
+  },
+  {
+    "name": "Echo Draw",
+    "rarity": "Epic",
+    "description": "Next card drawn is played twice."
+  },
+  {
+    "name": "Out of Sync",
+    "rarity": "Epic",
+    "description": "Opponent\u2019s cards resolve in a random order."
+  },
+  {
+    "name": "Risk Spike",
+    "rarity": "Epic",
+    "description": "Opponent busts at 20 instead of 21."
+  },
+  {
+    "name": "Dealer\u2019s Whisper",
+    "rarity": "Epic",
+    "description": "Force dealer to reveal their next card."
+  },
+  {
+    "name": "False Confidence",
+    "rarity": "Epic",
+    "description": "Opponent\u2019s next modifier card is negated."
+  },
+  {
+    "name": "Decoy",
+    "rarity": "Epic",
+    "description": "Force opponent to draw one extra card."
+  },
+  {
+    "name": "Split Strike",
+    "rarity": "Epic",
+    "description": "If you drew two cards with the same value, attack twice."
+  },
+  {
+    "name": "Memory Play",
+    "rarity": "Epic",
+    "description": "Replay the last card you played this run."
+  },
+  {
+    "name": "Double or Nothing",
+    "rarity": "Epic",
+    "description": "Double damage if you win; take 5 damage if you lose."
+  },
+  {
+    "name": "Flare Attack",
+    "rarity": "Epic",
+    "description": "If your total ends in 9, deal bonus burn damage."
+  },
+  {
+    "name": "Early Exit",
+    "rarity": "Epic",
+    "description": "Leave the round before hitting; no damage taken."
+  },
+  {
+    "name": "Panic Trigger",
+    "rarity": "Epic",
+    "description": "If opponent draws 3 or more cards, stun them next turn."
+  },
+  {
+    "name": "Rewire",
+    "rarity": "Epic",
+    "description": "Opponent\u2019s hand is shuffled and redrawn."
+  },
+  {
+    "name": "Anchor Card",
+    "rarity": "Epic",
+    "description": "Lock a card in your hand so it can\u2019t be changed."
   }
 ]
