@@ -1,0 +1,8 @@
+[
+  {
+    "name": "Defensive Draw",
+    "rarity": "Common",
+    "description": "Draw one card and gain 2 armor.",
+    "effects": [{ "target": "self", "when": "immediately", "effect": "armor_add", "value": 2 }]
+  }
+]

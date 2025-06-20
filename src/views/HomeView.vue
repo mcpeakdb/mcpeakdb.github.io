@@ -11,7 +11,7 @@ import CardSuit from '@/components/StandardCard/CardSuit.vue';
     <h1 class="text-4xl font-bold text-white text-center">Welcome to Card Games</h1>
     <p class="text-lg text-gray-300 mb-2 text-center">Choose a game to play!</p>
 
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2">
       <router-link to="/blackjack">
         <ActionButton variant="neutral">
           <div class="flex w-full justify-around">
@@ -30,6 +30,19 @@ import CardSuit from '@/components/StandardCard/CardSuit.vue';
           <span class="text-uno-yellow">UNO</span><br />
           Now in Beta!
           <div class="flex w-full justify-around text-uno-red">⟲</div>
+        </ActionButton>
+      </router-link>
+      <router-link to="/blackjack-blitz">
+        <ActionButton variant="neutral">
+          <div class="flex w-full justify-around">
+            <CardSuit suit="club" /> <CardSuit suit="diamond" class="text-red-500" />
+          </div>
+          Play Blackjack Blitz
+          <br />
+          (now in Beta)
+          <div class="flex w-full justify-around">
+            <CardSuit suit="heart" class="text-red-500" /> <CardSuit suit="spade" />
+          </div>
         </ActionButton>
       </router-link>
     </div>

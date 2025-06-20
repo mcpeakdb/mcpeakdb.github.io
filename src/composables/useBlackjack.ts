@@ -17,6 +17,7 @@ const gameState = computed(() => ({
   isGameOver: isGameOver.value,
   isComputerThinking: isComputerThinking.value,
   showComputerHand: showComputerHand.value,
+  standardDeck: standardDeck,
 }));
 
 function reset(): void {
