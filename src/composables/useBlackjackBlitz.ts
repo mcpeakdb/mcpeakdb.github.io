@@ -110,6 +110,10 @@ function calculateDamage(handTotal: number, isBust: boolean): number {
     damage += gameConfig.damage_tiers['18-20'];
   } else if (handTotal >= 15 && handTotal <= 17) {
     damage += gameConfig.damage_tiers['15-17'];
+  } else if (handTotal >= 12 && handTotal <= 14) {
+    damage += gameConfig.damage_tiers['12-14'];
+  } else if (handTotal >= 9 && handTotal <= 11) {
+    damage += gameConfig.damage_tiers['1-11'];
   }
 
   return damage;
