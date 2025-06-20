@@ -99,14 +99,14 @@ const innerCardClasses = ref('w-full h-full border border-gray-800 rounded-lg ov
 <style scoped>
 .card-flip-enter-active,
 .card-flip-leave-active {
-  transition: transform 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .card-flip-enter-from {
-  transform: rotateY(-90deg);
+  transform: rotateY(-90deg) translateZ(-10px);
 }
 
 .card-flip-leave-to {
-  transform: rotateY(90deg);
+  transform: rotateY(90deg) translateZ(-10px);
 }
 </style>

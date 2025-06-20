@@ -370,15 +370,31 @@ const deckCardsRemaining = computed(() => deck.value.length);
   background-color: #e53e3e;
 }
 
+.text-uno-red {
+  color: #e53e3e;
+}
+
 .bg-uno-green {
   background-color: #38a169;
+}
+
+.text-uno-green {
+  color: #38a169;
 }
 
 .bg-uno-blue {
   background-color: #3182ce;
 }
 
+.text-uno-blue {
+  color: #3182ce;
+}
+
 .bg-uno-yellow {
   background-color: #d69e2e;
+}
+
+.text-uno-yellow {
+  color: #d69e2e;
 }
 </style>

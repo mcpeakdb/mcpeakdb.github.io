@@ -2,7 +2,6 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 
 import useBlackjack from '@/composables/useBlackjack';
-import StandardCardDeck from '@/components/StandardCard/StandardCardDeck.vue';
 import StandardCardHand from '@/components/StandardCard/StandardCardHand.vue';
 import ActionButton from '@/components/Layout/Buttons/ActionButton.vue';
 import TopMenu from '@/components/Layout/TopMenu.vue';
@@ -10,6 +9,7 @@ import BaseAlert from '@/components/Layout/Alerts/BaseAlert.vue';
 import { CARD_BACKS } from '@/constants/cardStyles';
 import { TABLE_THEMES } from '@/constants/tableThemes';
 import SimpleModal from '@/components/Layout/SimpleModal.vue';
+import { useResponsiveCardSize } from '@/composables/useResponsiveCardSize';
 
 const {
   gameState,
@@ -43,14 +43,16 @@ const stand = () => {
     endTurn();
   }
 };
+
+const { cardSize } = useResponsiveCardSize();
 </script>
 
 <template>
   <main
-    class="w-screen h-screen overflow-x-hidden flex flex-col bg-black"
+    class="w-screen h-screen overflow-x-hidden flex flex-col bg-black px-4"
     :class="{ 'pointer-events-none': gameState.isComputerThinking }"
   >
-    <div class="w-full flex justify-between p-2 fixed top-0 z-50 bg-inherit">
+    <div class="w-full flex justify-between py-2 static top-0 z-50 bg-inherit">
       <TopMenu />
       <ActionButton @click="settingsModal?.setShow(true)">Settings</ActionButton>
       <SimpleModal ref="settingsModal">
@@ -115,15 +117,10 @@ const stand = () => {
     </div>
 
     <div
-      class="h-[80vh] flex-grow flex grande:flex-col items-start grande:items-center justify-center gap-2 p-8 rotate-x-[30deg] scale-125 w-3/4 lg:w-1/2 mx-auto my-16 rounded-2xl mt-24"
+      class="h-full flex-grow flex flex-col items-center justify-center gap-2 p-8 rotate-x-[30deg] w-full rounded-2xl"
       :class="TABLE_THEMES[tableTheme]"
     >
       <div class="flex gap-2">
-        <StandardCardDeck
-          :card-back="cardBack"
-          :show-count="false"
-          class="mt-2.5 mb-1.5 transform-3d"
-        />
         <StandardCardHand
           :card-back="cardBack"
           :hand="computerHand"
@@ -131,6 +128,7 @@ const stand = () => {
           orientation="horizontal"
           :is-interactive="false"
           class="transform-3d"
+          :size="cardSize"
         />
       </div>
 
@@ -146,14 +144,14 @@ const stand = () => {
           :visible="-1"
           orientation="horizontal"
           class="transform-3d"
+          :size="cardSize"
         />
       </div>
-
       <div class="flex-1 flex-grow text-center absolute bottom-0 left-0 mx-2 tall:my-2">
-        <div class="text-sm md:text-lg uppercase tracking-wider text-gray-400">Dealer Hand</div>
+        <div class="text-sm md:text-lg uppercase tracking-wider">Dealer</div>
         <div class="text-2xl md:text-3xl font-bold">
           <span v-if="gameState.showComputerHand">{{ computerHandTotal }}</span>
-          <span v-else class="text-yellow-500">??</span>
+          <span v-else>??</span>
         </div>
       </div>
 
@@ -165,13 +163,24 @@ const stand = () => {
             'pointer-events-none': gameState.isComputerThinking,
           }"
         >
-          <ActionButton class="text-base md:text-xl" @click="hit"> Hit </ActionButton>
           <ActionButton
-            class="text-base md:text-xl h-full"
-            :class="{
-              'opacity-50 cursor-not-allowed': playerHand.length < 2,
-              'cursor-pointer': playerHand.length >= 2,
-            }"
+            variant="plain"
+            class="text-base md:text-xl"
+            :class="CARD_BACKS[cardBack]"
+            @click="hit"
+          >
+            Hit
+          </ActionButton>
+          <ActionButton
+            variant="plain"
+            class="text-base md:text-xl"
+            :class="[
+              {
+                'opacity-50 cursor-not-allowed': playerHand.length < 2,
+                'cursor-pointer': playerHand.length >= 2,
+              },
+              CARD_BACKS[cardBack],
+            ]"
             :disabled="playerHand.length < 2"
             @click="stand"
           >
@@ -180,7 +189,9 @@ const stand = () => {
         </div>
         <ActionButton
           v-if="(!gameState.isDealt && playerHand.length === 0) || gameState.isGameOver"
+          variant="plain"
           class="text-base md:text-xl"
+          :class="CARD_BACKS[cardBack]"
           @click="dealHand"
         >
           Deal
@@ -188,13 +199,13 @@ const stand = () => {
       </div>
 
       <div class="flex-1 flex-grow text-center absolute bottom-0 right-0 mx-2 tall:my-2">
-        <div class="text-sm md:text-lg uppercase tracking-wider text-gray-400">Your Hand</div>
+        <div class="text-sm md:text-lg uppercase tracking-wider">Player</div>
         <div class="text-2xl md:text-3xl font-bold">{{ playerHandTotal }}</div>
       </div>
 
       <div
         v-if="gameState.isGameOver"
-        class="absolute w-full top-0 translate-y-1/2 flex justify-center"
+        class="absolute inset-0 flex items-center justify-center pointer-events-none"
       >
         <BaseAlert v-if="didPlayerWin"> 🎉 VICTORY! 🎉 </BaseAlert>
         <BaseAlert v-else variant="danger"> 💀 GAME OVER 💀 </BaseAlert>
@@ -202,8 +213,3 @@ const stand = () => {
     </div>
   </main>
 </template>
-<style scoped>
-.transform-3d {
-  transform-style: preserve-3d;
-}
-</style>

@@ -25,7 +25,6 @@ const props = withDefaults(defineProps<Props>(), {
   isInteractive: false,
   allowSelection: false,
   selectedCards: () => [],
-  overlapDistance: 60, // How much each card overlaps the previous one
   orientation: 'horizontal',
 });
 
@@ -49,9 +48,13 @@ const getCardStyle = (index: number) => {
     zIndex: index + 10,
 
     marginLeft:
-      index > 0 && props.orientation === 'horizontal' ? `-${props.overlapDistance}px` : undefined,
+      index > 0 && props.orientation === 'horizontal'
+        ? `-${props.size === 'sm' || props.size === 'xs' ? 40 : 60}px`
+        : undefined,
     marginTop:
-      index > 0 && props.orientation === 'vertical' ? `-${props.overlapDistance}px` : undefined,
+      index > 0 && props.orientation === 'vertical'
+        ? `-${props.size === 'sm' || props.size === 'xs' ? 40 : 60}px`
+        : undefined,
   };
 };
 

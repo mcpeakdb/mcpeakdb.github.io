@@ -36,6 +36,21 @@ const handleCardClick = (index: number) => {
     emit('cardClicked', index);
   }
 };
+
+const getCardStyle = (index: number) => {
+  return {
+    zIndex: index + 10,
+
+    marginLeft:
+      index > 0 && props.orientation === 'horizontal'
+        ? `-${props.size === 'sm' || props.size === 'xs' ? 40 : 60}px`
+        : undefined,
+    marginTop:
+      index > 0 && props.orientation === 'vertical'
+        ? `-${props.size === 'sm' || props.size === 'xs' ? 40 : 60}px`
+        : undefined,
+  };
+};
 </script>
 
 <template>
@@ -51,6 +66,7 @@ const handleCardClick = (index: number) => {
       :card="card"
       :card-back="cardBack"
       :size="size"
+      :style="getCardStyle(index)"
       :is-visible="isCardVisible(index)"
       :is-interactive="isInteractive && isCardVisible(index)"
       :is-highlighted="highlightedCardIndex === index"

@@ -6,6 +6,7 @@ const VARIANTS = {
     'text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-yellow-300 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800',
   neutral:
     'text-white bg-neutral-900 hover:bg-neutral-950 focus:ring-neutral-950 dark:bg-neutral-900 dark:hover:bg-neutral-950 dark:focus:ring-neutral-950',
+  plain: '',
 };
 
 const props = defineProps({
