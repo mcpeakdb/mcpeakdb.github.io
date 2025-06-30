@@ -10,8 +10,8 @@ import type {
   GameSettings,
   GameStatistics,
   Achievement
-} from '../types';
-import { QuestionGeneratorService } from '../services/QuestionGenerator';
+} from '@/creature-creation/types';
+import { QuestionGeneratorService } from '@/creature-creation/services/QuestionGenerator';
 
 export const useGameStore = defineStore('game', () => {
   // State
