@@ -4,6 +4,7 @@ import BlackjackView from '@/views/BlackjackView.vue';
 import BlackjackBlitzView from '@/views/BlackjackBlitzView.vue';
 import UnoView from '@/views/UnoView.vue';
 import AdventView from '@/views/AdventView.vue';
+import CreatureView from '@/views/CreatureView.vue';
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -32,6 +33,11 @@ const router = createRouter({
       path: '/advent',
       name: 'advent',
       component: AdventView,
+    },
+    {
+      path: '/creature',
+      name: 'creature',
+      component: CreatureView,
     },
   ],
 });
