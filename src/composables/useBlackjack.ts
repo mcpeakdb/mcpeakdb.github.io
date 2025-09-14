@@ -82,10 +82,10 @@ function getTotal(hand: StandardCardType[]): number {
   let totalAces = 0;
 
   hand.forEach((card) => {
-    if (card.values.length > 0) {
-      total += card.values[0];
-    } else if (card.text === 'A') {
+    if (card.text === 'A') {
       totalAces += 1;
+    } else if (card.values.length > 0) {
+      total += card.values[0];
     } else {
       // TODO: fallback for wildcards or unexpected cards
     }
