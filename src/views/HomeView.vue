@@ -37,5 +37,7 @@ import CardSuit from '@/components/StandardCard/CardSuit.vue';
         </ActionButton>
       </router-link>
     </div>
+
+    <router-link to="/creature" class="absolute bottom-0"> Don't click here! </router-link>
   </main>
 </template>
