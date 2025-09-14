@@ -4,20 +4,20 @@ import { SUIT_ASCII, type StandardCard as StandardCardType, type Suit } from '@/
 import { computed, ref } from 'vue';
 
 const cards = [
-  { id: 'a', text: 'A', value: [1, 11] },
-  { id: '2', text: '2', value: 2 },
-  { id: '3', text: '3', value: 3 },
-  { id: '4', text: '4', value: 4 },
-  { id: '5', text: '5', value: 5 },
-  { id: '6', text: '6', value: 6 },
-  { id: '7', text: '7', value: 7 },
-  { id: '8', text: '8', value: 8 },
-  { id: '9', text: '9', value: 9 },
-  { id: '10', text: '10', value: 10 },
-  { id: 'j', text: 'J', value: 10 },
-  { id: 'q', text: 'Q', value: 10 },
-  { id: 'k', text: 'K', value: 10 },
-] as const;
+  { id: 'a', text: 'A', values: [1, 11] },
+  { id: '2', text: '2', values: [2] },
+  { id: '3', text: '3', values: [3] },
+  { id: '4', text: '4', values: [4] },
+  { id: '5', text: '5', values: [5] },
+  { id: '6', text: '6', values: [6] },
+  { id: '7', text: '7', values: [7] },
+  { id: '8', text: '8', values: [8] },
+  { id: '9', text: '9', values: [9] },
+  { id: '10', text: '10', values: [10] },
+  { id: 'j', text: 'J', values: [10] },
+  { id: 'q', text: 'Q', values: [10] },
+  { id: 'k', text: 'K', values: [10] },
+];
 
 // Create shared state at module level
 const cardDeck = ref<StandardCardType[]>([]);
@@ -49,7 +49,7 @@ function buildDeck(): void {
     for (let j = 0; j < 4; j++) {
       const suit = suits[j];
       cardDeck.value.push({
-        value: cards[i].value,
+        values: cards[i].values,
         id: cards[i].id + '-' + suit,
         text: cards[i].text,
         suit: suit,

@@ -126,14 +126,13 @@ const { cardSize } = useResponsiveCardSize();
           :hand="computerHand"
           :visible="gameState.showComputerHand ? -1 : 1"
           orientation="horizontal"
-          :is-interactive="false"
           class="transform-3d"
           :size="cardSize"
         />
       </div>
 
       <div
-        class="relative flex gap-2"
+        class="flex gap-2"
         :class="{
           'pointer-events-none': gameState.isComputerThinking,
         }"
@@ -174,13 +173,7 @@ const { cardSize } = useResponsiveCardSize();
           <ActionButton
             variant="plain"
             class="text-base md:text-xl"
-            :class="[
-              {
-                'opacity-50 cursor-not-allowed': playerHand.length < 2,
-                'cursor-pointer': playerHand.length >= 2,
-              },
-              CARD_BACKS[cardBack],
-            ]"
+            :class="CARD_BACKS[cardBack]"
             :disabled="playerHand.length < 2"
             @click="stand"
           >

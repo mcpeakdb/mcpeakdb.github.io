@@ -1,4 +1,4 @@
-export type CardNumber = number | readonly [number, number];
+export type CardValues = number[];
 
 export const SUIT_ASCII = {
   diamond: '♦',
@@ -20,18 +20,12 @@ export type SuitColor = (typeof SUIT_COLORS)[Suit];
 export interface BaseCard {
   id: string;
   text: string;
-  value: CardNumber;
+  values: CardValues;
 }
 
 export interface StandardCard extends BaseCard {
   suit: Suit;
 }
-
-export interface UnoCard extends BaseCard {
-  suit: UnoColor;
-}
-
-export type UnoColor = 'red' | 'green' | 'yellow' | 'blue';
 
 export interface CardPosition {
   top?: string;

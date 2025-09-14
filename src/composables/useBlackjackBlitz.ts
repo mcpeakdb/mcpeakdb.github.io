@@ -176,9 +176,6 @@ async function startNewRound(): Promise<void> {
   gameState.activePlayerModifiers = [];
   gameState.activeComputerModifiers = [];
 
-  // Reset blackjack state for new round
-  blackjack.reset();
-
   // Deal new modifier cards
   dealModifierCards();
 
@@ -399,6 +396,7 @@ const computerChipsPercentage = computed(
 function initializeBlitzGame(): void {
   resetGame();
   // Don't call startNewRound here, let the component handle the first round
+
   gameState.currentPhase = 'setup';
   dealModifierCards();
   gameState.currentPhase = 'modifier-selection';

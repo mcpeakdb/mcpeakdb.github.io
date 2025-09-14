@@ -2,11 +2,12 @@
 import { computed } from 'vue';
 import { SUIT_COLORS, type StandardCard } from '@/types/cards';
 import CardSuit from './CardSuit.vue';
+import type { CardSize } from '@/constants/cardStyles';
 
 interface Props {
   card: StandardCard;
   position?: 'top-left' | 'bottom-right';
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: CardSize;
   showSuit?: boolean;
 }
 
@@ -27,9 +28,10 @@ const positionClasses = computed(() => {
 const sizeClasses = computed(() => {
   const sizes = {
     xs: 'text-xs',
-    sm: 'text-sm',
-    md: 'text-base',
-    lg: 'text-lg',
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-sm',
+    xl: 'text-sm',
   };
   return sizes[props.size];
 });
@@ -39,7 +41,8 @@ const suitSize = computed(() => {
     xs: 'xs',
     sm: 'xs',
     md: 'sm',
-    lg: 'md',
+    lg: 'sm',
+    xl: 'md',
   } as const;
   return suitSizes[props.size];
 });

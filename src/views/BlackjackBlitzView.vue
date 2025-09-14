@@ -301,36 +301,26 @@ const { cardSize } = useResponsiveCardSize();
       style="transform-style: preserve-3d"
     >
       <!-- Computer Hand -->
-      <div class="flex gap-2">
-        <StandardCardHand
-          :card-back="cardBack"
-          :hand="computerHand"
-          :visible="blackjackState.showComputerHand ? -1 : 1"
-          orientation="horizontal"
-          :is-interactive="false"
-          class="transform-gpu"
-          style="transform-style: preserve-3d"
-          :size="cardSize"
-        />
-      </div>
+      <StandardCardHand
+        :card-back="cardBack"
+        :hand="computerHand"
+        :visible="blackjackState.showComputerHand ? -1 : 1"
+        orientation="horizontal"
+        class="transform-gpu"
+        style="transform-style: preserve-3d"
+        :size="cardSize"
+      />
 
       <!-- Player Hand -->
-      <div
-        class="relative flex gap-2"
-        :class="{
-          'pointer-events-none': blackjackState.isComputerThinking,
-        }"
-      >
-        <StandardCardHand
-          :card-back="cardBack"
-          :hand="playerHand"
-          :visible="-1"
-          orientation="horizontal"
-          class="transform-gpu"
-          style="transform-style: preserve-3d"
-          :size="cardSize"
-        />
-      </div>
+      <StandardCardHand
+        :card-back="cardBack"
+        :hand="playerHand"
+        :visible="-1"
+        orientation="horizontal"
+        class="transform-gpu"
+        style="transform-style: preserve-3d"
+        :size="cardSize"
+      />
 
       <!-- Dealer Score -->
       <div class="flex-1 flex-grow text-center absolute bottom-0 left-0 mx-2 tall:my-2">
@@ -371,13 +361,7 @@ const { cardSize } = useResponsiveCardSize();
           <ActionButton
             variant="plain"
             class="text-base md:text-xl"
-            :class="[
-              {
-                'opacity-50 cursor-not-allowed': playerHand.length < 2 || playerHandTotal > 21,
-                'cursor-pointer': playerHand.length >= 2 && playerHandTotal <= 21,
-              },
-              CARD_BACKS[cardBack],
-            ]"
+            :class="CARD_BACKS[cardBack]"
             :disabled="playerHand.length < 2 || playerHandTotal > 21"
             @click="selectAction('stand')"
           >
@@ -388,10 +372,9 @@ const { cardSize } = useResponsiveCardSize();
         <!-- Deal Button - Updated condition to exclude bust scenarios -->
         <ActionButton
           v-if="
-            ((!blackjackState.isDealt && playerHand.length === 0) ||
-              (blackjackState.isGameOver &&
-                gameState.currentPhase !== 'damage-calculation' &&
-                !gameState.bustHandled) ||
+            ((blackjackState.isGameOver &&
+              gameState.currentPhase !== 'damage-calculation' &&
+              !gameState.bustHandled) ||
               gameState.currentPhase === 'modifier-selection') &&
             !isGameOver
           "
@@ -400,8 +383,7 @@ const { cardSize } = useResponsiveCardSize();
           :class="CARD_BACKS[cardBack]"
           @click="handleDeal"
         >
-          <span v-if="gameState.currentPhase === 'modifier-selection'">Start Round</span>
-          <span v-else>Deal</span>
+          <span>Start Round</span>
         </ActionButton>
 
         <!-- New Game Button -->
@@ -566,20 +548,3 @@ const { cardSize } = useResponsiveCardSize();
     </div>
   </main>
 </template>
-
-<style scoped>
-/* Minimal scoped styles - only for complex animations that can't be done with Tailwind */
-@keyframes armorGlow {
-  0%,
-  100% {
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
-  }
-}
-
-.armor-glow {
-  animation: armorGlow 2s ease-in-out infinite;
-}
-</style>

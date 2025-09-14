@@ -14,10 +14,22 @@ const props = defineProps({
     type: String as () => keyof typeof VARIANTS,
     default: () => 'action',
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const classes = computed(() => {
-  return VARIANTS[props.variant];
+  let classes = VARIANTS[props.variant];
+
+  if (props.disabled) {
+    classes += ' opacity-50 cursor-not-allowed';
+  } else {
+    classes += ' cursor-pointer';
+  }
+
+  return classes;
 });
 </script>
 

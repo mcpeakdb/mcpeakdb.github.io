@@ -8,7 +8,6 @@ export const CARD_BACKS = {
     'bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 animate-gradient text-white',
   cosmic:
     'bg-black bg-opacity-90 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-600 via-blue-900 to-black animate-pulse text-white',
-  uno: 'bg-black text-white',
 } as const;
 
 export const CARD_SIZES = {
@@ -21,7 +20,6 @@ export const CARD_SIZES = {
 
 export const CARD_ANIMATIONS = {
   deal: 'transition-all duration-500 ease-out',
-  hover: 'hover:scale-105 hover:shadow-lg transition-transform duration-200',
   flip: 'transition-transform duration-300 transform-style-preserve-3d',
 } as const;
 

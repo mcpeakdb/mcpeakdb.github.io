@@ -29,9 +29,7 @@ function reset(): void {
 }
 
 function initializeGame(): void {
-  if (standardDeck.cardDeck.value.length === 0) {
-    standardDeck.buildDeck();
-  }
+  standardDeck.buildDeck();
 }
 
 async function dealHand(): Promise<void> {
@@ -40,24 +38,25 @@ async function dealHand(): Promise<void> {
   showComputerHand.value = false;
   isComputerThinking.value = true;
   isGameOver.value = false;
-  standardDeck.fillDeck();
 
-  standardDeck.dealCard();
-  await standardDeck.sleep();
-  standardDeck.dealComputerCard();
-  await standardDeck.sleep();
-  standardDeck.dealCard();
-  await standardDeck.sleep();
-  standardDeck.dealComputerCard();
+  setTimeout(async () => {
+    standardDeck.dealCard();
+    await standardDeck.sleep();
+    standardDeck.dealComputerCard();
+    await standardDeck.sleep();
+    standardDeck.dealCard();
+    await standardDeck.sleep();
+    standardDeck.dealComputerCard();
 
-  if (computerHandTotal.value === 21) {
-    handleEndGame();
-    showResult(false);
-    return;
-  }
+    if (computerHandTotal.value === 21) {
+      handleEndGame();
+      showResult(false);
+      return;
+    }
 
-  isComputerThinking.value = false;
-  isDealt.value = true;
+    isComputerThinking.value = false;
+    isDealt.value = true;
+  }, 500);
 }
 
 function hit(): void {
@@ -82,23 +81,15 @@ function getTotal(hand: StandardCardType[]): number {
   let total = 0;
   let totalAces = 0;
 
-  hand
-    .toSorted((a, b) => {
-      if (typeof a.value === 'number') {
-        return -1;
-      } else if (typeof b.value === 'number') {
-        return 1;
-      } else {
-        return 1;
-      }
-    })
-    .forEach((card) => {
-      if (typeof card.value === 'number') {
-        total += card.value;
-      } else {
-        totalAces += 1;
-      }
-    });
+  hand.forEach((card) => {
+    if (card.values.length > 0) {
+      total += card.values[0];
+    } else if (card.text === 'A') {
+      totalAces += 1;
+    } else {
+      // TODO: fallback for wildcards or unexpected cards
+    }
+  });
 
   total += totalAces;
 

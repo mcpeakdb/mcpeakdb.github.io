@@ -23,15 +23,6 @@ import CardSuit from '@/components/StandardCard/CardSuit.vue';
           </div>
         </ActionButton>
       </router-link>
-      <router-link to="/uno">
-        <ActionButton variant="neutral">
-          <div class="flex w-full justify-around text-uno-blue">⊘</div>
-          Play
-          <span class="text-uno-yellow">UNO</span><br />
-          Now in Beta!
-          <div class="flex w-full justify-around text-uno-red">⟲</div>
-        </ActionButton>
-      </router-link>
       <router-link to="/blackjack-blitz">
         <ActionButton variant="neutral">
           <div class="flex w-full justify-around">

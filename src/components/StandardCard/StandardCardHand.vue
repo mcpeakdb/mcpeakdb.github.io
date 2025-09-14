@@ -10,10 +10,7 @@ interface Props {
   visible?: number;
   size?: CardSize;
   cardBack: CardBack;
-  isInteractive?: boolean;
   allowSelection?: boolean;
-  selectedCards?: string[];
-  overlapDistance?: number;
   orientation?: 'horizontal' | 'vertical';
 }
 
@@ -22,9 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
   visible: -1,
   size: 'md',
   cardBack: 'red',
-  isInteractive: false,
   allowSelection: false,
-  selectedCards: () => [],
   orientation: 'horizontal',
 });
 
@@ -35,11 +30,10 @@ const emit = defineEmits<{
 }>();
 
 const handClasses = computed(() => [
-  'flex items-center transition-all duration-300',
+  'flex items-center transition-all duration-300 cursor-pointer',
   {
     'flex-row': props.orientation === 'horizontal',
     'flex-col': props.orientation === 'vertical',
-    'cursor-pointer': props.isInteractive,
   },
 ]);
 
@@ -62,10 +56,6 @@ const isCardVisible = (index: number) => {
   return props.visible === -1 || index < props.visible;
 };
 
-const isCardSelected = (card: StandardCardType) => {
-  return props.selectedCards.includes(card.id);
-};
-
 const handleCardClick = (card: StandardCardType, index: number) => {
   emit('cardClick', card, index);
   if (props.allowSelection) {
@@ -79,9 +69,18 @@ const handleHandClick = () => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-2">
+  <div>
     <div v-if="hand.length > 0" :class="handClasses" @click="handleHandClick">
-      <TransitionGroup name="hand-card" tag="div" class="flex" style="transform-style: preserve-3d">
+      <TransitionGroup
+        name="hand-card"
+        tag="div"
+        class="flex"
+        style="transform-style: preserve-3d"
+        enter-active-class="transition-all duration-600 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+        leave-active-class="transition-all duration-600 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
+      >
         <StandardCard
           v-for="(card, index) in hand"
           :key="`hand-${card.id}`"
@@ -89,10 +88,11 @@ const handleHandClick = () => {
           :size="size"
           :card-back="cardBack"
           :is-face-up="isCardVisible(index)"
-          :is-interactive="isInteractive"
-          :is-selected="isCardSelected(card)"
-          :style="getCardStyle(index)"
-          class="hand-card transition-all duration-300 hover:scale-105 hover:translateZ-20"
+          :style="{
+            ...getCardStyle(index),
+            filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.3))',
+            transformStyle: 'preserve-3d',
+          }"
           @click="() => handleCardClick(card, index)"
         />
       </TransitionGroup>
@@ -110,22 +110,11 @@ const handleHandClick = () => {
 
 .hand-card-enter-from {
   opacity: 0;
-  transform: translateX(100vw) rotateY(-90deg) translateZ(100px);
+  transform: translateX(100vw) rotateY(-90deg);
 }
 
 .hand-card-leave-to {
   opacity: 0;
-  transform: translateY(-200px) rotateX(90deg) translateZ(100px);
-}
-
-.hand-card {
-  transform-style: preserve-3d;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
-}
-
-.hand-card:hover {
-  z-index: 999 !important;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4));
-  transform: translateZ(20px) scale(1.05) !important;
+  transform: translateY(-200px) rotateX(90deg);
 }
 </style>

@@ -1,36 +1,37 @@
 <script setup lang="ts" generic="T extends BaseCard">
 import { computed, ref, type StyleValue } from 'vue';
-import { CARD_SIZES, CARD_ANIMATIONS, type CardSize } from '@/constants/cardStyles';
+import {
+  CARD_SIZES,
+  CARD_ANIMATIONS,
+  CARD_BACKS,
+  type CardBack,
+  type CardSize,
+} from '@/constants/cardStyles';
 import type { BaseCard } from '@/types/cards';
 
 interface Props {
+  back?: CardBack;
   isFaceUp?: boolean;
-  isInteractive?: boolean;
-  isDisabled?: boolean;
   isSelected?: boolean;
   size?: CardSize;
   customClass?: string;
   customStyle?: StyleValue;
   showFlipAnimation?: boolean;
-  card?: T;
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  back: 'red',
   isFaceUp: false,
-  isInteractive: false,
-  isDisabled: false,
   isSelected: false,
   size: 'md',
   customClass: '',
   customStyle: undefined,
   showFlipAnimation: false,
-  card: undefined,
 });
 
 const emit = defineEmits<{
-  click: [card: T | undefined, event: MouseEvent | undefined];
-  hover: [card: T | undefined, event: MouseEvent | undefined];
-  select: [card: T | undefined];
+  click: [event: MouseEvent | undefined];
+  hover: [event: MouseEvent | undefined];
 }>();
 
 const cardClasses = computed(() => {
@@ -38,18 +39,14 @@ const cardClasses = computed(() => {
 
   return [
     // Base styles
-    'flex items-center justify-center rounded-lg overflow-hidden select-none',
+    'flex items-center justify-center rounded-lg overflow-hidden transform transition-all duration-300 ease-cubic-bezier[0.25,0.46,0.45,0.94] cursor-pointer',
     sizeConfig.width,
     sizeConfig.height,
 
     // Interactive styles
     {
-      [CARD_ANIMATIONS.hover]: props.isInteractive && !props.isDisabled,
       [CARD_ANIMATIONS.flip]: props.showFlipAnimation,
-      'cursor-pointer': props.isInteractive && !props.isDisabled,
-      'cursor-not-allowed opacity-50': props.isDisabled,
       'ring-2 ring-blue-500': props.isSelected,
-      'shadow-md': !props.isDisabled,
     },
 
     // Custom classes
@@ -58,20 +55,17 @@ const cardClasses = computed(() => {
 });
 
 const handleClick = (event: MouseEvent) => {
-  if (props.isDisabled) return;
-
-  emit('click', props.card, event);
-  if (props.isInteractive) {
-    emit('select', props.card);
-  }
+  emit('click', event);
 };
 
 const handleMouseEnter = (event: MouseEvent) => {
-  if (props.isDisabled) return;
-  emit('hover', props.card, event);
+  emit('hover', event);
 };
 
-const innerCardClasses = ref('w-full h-full border border-gray-800 rounded-lg overflow-hidden');
+const innerCardClasses = ref(
+  'w-full h-full border border-gray-800 rounded-lg overflow-hidden absolute inset-0 transition-transform duration-400 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ' +
+    CARD_BACKS[props.back],
+);
 </script>
 
 <template>
@@ -79,34 +73,28 @@ const innerCardClasses = ref('w-full h-full border border-gray-800 rounded-lg ov
     :class="cardClasses"
     :style="customStyle"
     role="button"
-    :tabindex="isInteractive && !isDisabled ? 0 : -1"
-    :aria-disabled="isDisabled"
     :aria-selected="isSelected"
+    style="perspective: 1000px"
     @click="handleClick"
     @mouseenter="handleMouseEnter"
   >
-    <Transition name="card-flip" mode="out-in">
-      <div v-if="isFaceUp" key="front" :class="innerCardClasses">
-        <slot name="front" :card="card"></slot>
+    <div class="relative w-full h-full" style="transform-style: preserve-3d">
+      <div
+        :class="innerCardClasses"
+        :style="{
+          transform: isFaceUp ? 'rotateY(0deg)' : 'rotateY(180deg)',
+          backfaceVisibility: 'hidden',
+        }"
+      >
+        <slot name="front"></slot>
       </div>
-      <div v-else key="back" :class="innerCardClasses">
-        <slot name="back" :card="card"></slot>
-      </div>
-    </Transition>
+      <div
+        :class="innerCardClasses"
+        :style="{
+          transform: isFaceUp ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+          backfaceVisibility: 'hidden',
+        }"
+      ></div>
+    </div>
   </div>
 </template>
-
-<style scoped>
-.card-flip-enter-active,
-.card-flip-leave-active {
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.card-flip-enter-from {
-  transform: rotateY(-90deg) translateZ(-10px);
-}
-
-.card-flip-leave-to {
-  transform: rotateY(90deg) translateZ(-10px);
-}
-</style>

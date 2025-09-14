@@ -1,39 +1,41 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { type StandardCard, SUIT_COLORS } from '@/types/cards';
-import { CARD_BACKS, type CardSize, type CardBack } from '@/constants/cardStyles';
+import { type CardSize, type CardBack } from '@/constants/cardStyles';
 import BaseCard from '../BaseCard.vue';
 import CardSuit from './CardSuit.vue';
 import CornerNumber from './CornerNumber.vue';
 
-interface Props {
-  card: StandardCard;
-  isFaceUp?: boolean;
-  isInteractive?: boolean;
-  isSelected?: boolean;
-  size?: CardSize;
-  cardBack?: CardBack;
-  showAnimation?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  isFaceUp: false,
-  isInteractive: false,
-  isSelected: false,
-  size: 'md',
-  cardBack: 'red',
-  showAnimation: true,
+const props = defineProps({
+  card: {
+    type: Object as () => StandardCard,
+    required: true,
+  },
+  isFaceUp: {
+    type: Boolean,
+    default: false,
+  },
+  size: {
+    type: String as () => CardSize,
+    default: 'md',
+  },
+  cardBack: {
+    type: String as () => CardBack,
+    default: 'red',
+  },
+  showAnimation: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits<{
-  click: [card: StandardCard];
-  select: [card: StandardCard];
+  (e: 'click', id: StandardCard): void;
+  (e: 'select', value: StandardCard): void;
 }>();
 
 // Card type detection
-const cardValue = computed(() =>
-  Array.isArray(props.card.value) ? props.card.value[0] : props.card.value,
-);
+const noOfSuitSymbols = computed(() => props.card.values[0]);
 
 const isFaceCard = computed(() => ['J', 'Q', 'K'].includes(props.card.text));
 const isAce = computed(() => props.card.text === 'A');
@@ -135,20 +137,17 @@ const getSuitPositions = (value: number) => {
 const handleCardClick = (card: StandardCard | undefined) => {
   if (!card) return;
   emit('click', card);
-  emit('select', card);
 };
 </script>
 
 <template>
   <BaseCard
     :is-face-up="isFaceUp"
-    :is-interactive="isInteractive"
-    :is-selected="isSelected"
     :size="size"
     :show-flip-animation="showAnimation"
     :card="card"
-    :custom-class="'card-3d'"
-    @click="handleCardClick"
+    :back="cardBack"
+    @click="handleCardClick(card)"
   >
     <template #front>
       <div
@@ -156,13 +155,13 @@ const handleCardClick = (card: StandardCard | undefined) => {
         :class="cardClasses"
       >
         <!-- Corner numbers -->
-        <CornerNumber :card="card" position="top-left" :size="size === 'sm' ? 'xs' : 'sm'" />
-        <CornerNumber :card="card" position="bottom-right" :size="size === 'sm' ? 'xs' : 'sm'" />
+        <CornerNumber :card="card" position="top-left" :size="size" />
+        <CornerNumber :card="card" position="bottom-right" :size="size" />
 
         <!-- Card content -->
         <div class="absolute inset-4 flex items-center justify-center">
           <!-- Face cards -->
-          <div v-if="isFaceCard" class="text-6xl text-jacquard-24 card-symbol">
+          <div v-if="isFaceCard" class="text-6xl text-jacquard-24">
             {{ card.text }}
           </div>
 
@@ -171,7 +170,6 @@ const handleCardClick = (card: StandardCard | undefined) => {
             v-else-if="isAce"
             :suit="card.suit"
             :size="card.suit === 'spade' ? 'xl' : 'lg'"
-            class="card-symbol"
           />
 
           <!-- Number cards -->
@@ -184,59 +182,16 @@ const handleCardClick = (card: StandardCard | undefined) => {
             </div>
             <div v-else>
               <CardSuit
-                v-for="(position, index) in getSuitPositions(cardValue)"
+                v-for="(position, index) in getSuitPositions(noOfSuitSymbols)"
                 :key="`suit-${index}`"
                 :suit="card.suit"
                 :size="size"
-                :class="[
-                  'absolute card-symbol',
-                  position.class,
-                  { 'rotate-180': position.rotated },
-                ]"
+                :class="['absolute', position.class, { 'rotate-180': position.rotated }]"
               />
             </div>
           </div>
         </div>
       </div>
     </template>
-
-    <template #back>
-      <div
-        v-if="cardBack === 'uno'"
-        class="w-full h-full relative rounded-lg shadow-lg overflow-hidden bg-black transform-3d backface-hidden"
-      >
-        <!-- Red Oval -->
-        <div class="absolute inset-0 flex justify-center items-center">
-          <div class="w-[75%] h-full rounded-[100%] bg-red-600 transform rotate-45 scale-110"></div>
-        </div>
-
-        <!-- UNO Text -->
-        <div class="absolute inset-0 flex justify-center items-center">
-          <span class="text-xl font-extrabold italic text-yellow-300 drop-shadow-lg">UNO</span>
-        </div>
-      </div>
-      <div
-        v-else
-        class="w-full h-full transform-3d backface-hidden"
-        :class="CARD_BACKS[cardBack]"
-      ></div>
-    </template>
   </BaseCard>
 </template>
-
-<style scoped>
-.card-3d {
-  transform-style: preserve-3d;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.card-3d:hover {
-  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.35));
-}
-
-.card-symbol {
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-}
-</style>

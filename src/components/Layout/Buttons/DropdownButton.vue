@@ -20,6 +20,10 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  variant: {
+    type: String as () => 'action' | 'neutral' | 'plain',
+    default: 'action',
+  },
 });
 
 const isOpen = ref(false);
@@ -27,7 +31,7 @@ const isOpen = ref(false);
 
 <template>
   <div class="relative inline-block text-left">
-    <ActionButton @click="isOpen = !isOpen">{{ label }}</ActionButton>
+    <ActionButton :variant="variant" @click="isOpen = !isOpen">{{ label }}</ActionButton>
 
     <div
       v-if="isOpen"
