@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import HomeView from '@/views/HomeView.vue';
 import BlackjackView from '@/views/BlackjackView.vue';
 import BlackjackBlitzView from '@/views/BlackjackBlitzView.vue';
+import CreatureView from '@/views/CreatureView.vue';
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -20,6 +21,11 @@ const router = createRouter({
       path: '/blackjack-blitz',
       name: 'blackjack-blitz',
       component: BlackjackBlitzView,
+    },
+    {
+      path: '/creature',
+      name: 'creature',
+      component: CreatureView,
     },
   ],
 });
