@@ -478,7 +478,7 @@ const { cardSize } = useResponsiveCardSize();
         v-if="gameState.currentPhase === 'modifier-selection'"
         class="w-full px-4 py-2 bg-gray-900 bg-opacity-50"
       >
-        <div class="grid grid-cols-3 w-full justify-between">
+        <div class="grid grid-cols-3 w-full justify-between gap-2">
           <div v-if="gameState.playerModifierCards.length > 0" class="col-span-2">
             <div class="text-xs text-gray-400 mb-2 text-center">Your Modifier Cards</div>
             <div class="flex gap-2 justify-center w-full overflow-visible">
