@@ -1,24 +1,11 @@
 import { computed, reactive } from 'vue';
 import useBlackjack from './useBlackjack';
-import modifierCardsData from '@/assets/blackjack-blitz/modifier-cards.json';
+import modifierCardsData, {
+  type EffectWhen,
+  type ModifierCard,
+} from '@/assets/blackjack-blitz/modifier-cards';
 import gameConfig from '@/assets/blackjack-blitz/game-config.json';
 import { applyEffect } from './blackjackBlitz.helpers';
-
-export interface ModifierCard {
-  name: string;
-  rarity: 'Common' | 'Uncommon' | 'Rare' | 'Epic';
-  id?: string;
-  description: string;
-  effects: Effect[];
-  isActive: boolean;
-}
-
-export interface Effect {
-  target: 'self' | 'opponent';
-  effect: string;
-  when: 'on_bust' | 'draw' | 'immediately';
-  value?: number;
-}
 
 export interface GameState {
   playerChips: number;
@@ -27,15 +14,14 @@ export interface GameState {
   computerArmor: number;
   maxChips: number;
   playerModifierCards: ModifierCard[];
-  computerModifierCards: ModifierCard[];
   activePlayerModifiers: ModifierCard[];
-  activeComputerModifiers: ModifierCard[];
   currentPhase: 'setup' | 'modifier-selection' | 'blackjack' | 'damage-calculation' | 'game-over';
   roundNumber: number;
   isPlayerTurn: boolean;
   canPlayModifier: boolean;
   bustHandled: boolean;
   lastDamageBlocked: { player: number; computer: number };
+  lastDamageTaken: { player: number; computer: number };
 }
 
 // Initialize game state
@@ -46,15 +32,14 @@ const gameState = reactive<GameState>({
   computerArmor: 0,
   maxChips: gameConfig.base_chips,
   playerModifierCards: [],
-  computerModifierCards: [],
   activePlayerModifiers: [],
-  activeComputerModifiers: [],
   currentPhase: 'setup',
   roundNumber: 1,
   isPlayerTurn: true,
   canPlayModifier: true,
   bustHandled: false,
   lastDamageBlocked: { player: 0, computer: 0 },
+  lastDamageTaken: { player: 0, computer: 0 },
 });
 
 // Use the base blackjack composable
@@ -78,7 +63,6 @@ function drawModifierCards(count: number = 3): ModifierCard[] {
 
 function dealModifierCards(): void {
   gameState.playerModifierCards = drawModifierCards(3);
-  gameState.computerModifierCards = drawModifierCards(3);
 }
 
 function applyArmorProtection(
@@ -132,36 +116,25 @@ function applyDamage(
   // Apply remaining damage to chips
   if (isPlayer) {
     gameState.playerChips = Math.max(0, gameState.playerChips - finalDamage);
+    gameState.lastDamageTaken.player = finalDamage;
   } else {
     gameState.computerChips = Math.max(0, gameState.computerChips - finalDamage);
+    gameState.lastDamageTaken.computer = finalDamage;
   }
 
   return { finalDamage, blockedDamage };
 }
 
 // Modifier card effects
-function applyModifierEffect(card: ModifierCard, isPlayer: boolean): void {
+function applyModifierEffect(card: ModifierCard): void {
   // Add to active modifiers
-  if (isPlayer) {
-    gameState.activePlayerModifiers.push(card);
-  } else {
-    gameState.activeComputerModifiers.push(card);
-  }
+
+  gameState.activePlayerModifiers.push(card);
 
   // Apply specific card effects
-  for (const effect in card.effects) {
-    const effectData = card.effects[effect];
-    if (effectData.when === 'immediately') {
-      if (effectData.target === 'self') {
-        applyEffect(effectData, true, gameState, blackjack);
-      } else if (effectData.target === 'opponent') {
-        applyEffect(effectData, false, gameState, blackjack);
-      }
-    }
-  }
+  processEffects('immediately', card, gameState);
 }
 
-// Game flow management
 async function startNewRound(): Promise<void> {
   gameState.currentPhase = 'setup';
   gameState.roundNumber++;
@@ -174,7 +147,7 @@ async function startNewRound(): Promise<void> {
 
   // Clear active modifiers from previous round
   gameState.activePlayerModifiers = [];
-  gameState.activeComputerModifiers = [];
+  console.log(gameState.activePlayerModifiers);
 
   // Deal new modifier cards
   dealModifierCards();
@@ -182,21 +155,13 @@ async function startNewRound(): Promise<void> {
   gameState.currentPhase = 'modifier-selection';
 }
 
-function playModifierCard(card: ModifierCard, isPlayer: boolean = true): void {
+function playModifierCard(card: ModifierCard): void {
   if (!gameState.canPlayModifier) return;
 
-  if (isPlayer) {
-    const cardIndex = gameState.playerModifierCards.findIndex((c) => c.id === card.id);
-    if (cardIndex !== -1) {
-      gameState.playerModifierCards.splice(cardIndex, 1);
-      applyModifierEffect(card, isPlayer);
-    }
-  } else {
-    const cardIndex = gameState.computerModifierCards.findIndex((c) => c.id === card.id);
-    if (cardIndex !== -1) {
-      gameState.computerModifierCards.splice(cardIndex, 1);
-      applyModifierEffect(card, isPlayer);
-    }
+  const cardIndex = gameState.playerModifierCards.findIndex((c) => c.id === card.id);
+  if (cardIndex !== -1) {
+    gameState.playerModifierCards.splice(cardIndex, 1);
+    applyModifierEffect(card);
   }
 }
 
@@ -227,17 +192,13 @@ async function handlePlayerBust(): Promise<void> {
   if (gameState.bustHandled) return;
   gameState.bustHandled = true;
 
-  if (gameState.playerModifierCards.length > 0) {
-    gameState.playerModifierCards.forEach((card) => {
-      card.effects.forEach((effectData) => {
-        if (effectData.when === 'on_bust') {
-          if (effectData.target === 'self') {
-            applyEffect(effectData, true, gameState, useBlackjack);
-          } else if (effectData.target === 'opponent') {
-            applyEffect(effectData, false, gameState, blackjack);
-          }
-        }
-      });
+  if (gameState.activePlayerModifiers.length > 0) {
+    gameState.activePlayerModifiers.forEach((card) => {
+      processEffects('on_bust', card, gameState);
+    });
+
+    gameState.activePlayerModifiers.forEach((card) => {
+      processEffects('game_end', card, gameState);
     });
   }
 
@@ -260,9 +221,25 @@ async function blitzStand(): Promise<void> {
 }
 
 async function executeStand(): Promise<void> {
+  gameState.activePlayerModifiers.forEach((card) => {
+    processEffects('game_end', card, gameState);
+  });
+
   await blackjack.endTurn();
   gameState.canPlayModifier = false;
   await calculateRoundResult();
+}
+
+function processEffects(when: EffectWhen, card: ModifierCard, gameState: GameState): void {
+  card.effects?.forEach((effectData) => {
+    if (effectData.when === when) {
+      if (effectData.target === 'self') {
+        applyEffect(effectData, true, gameState, useBlackjack);
+      } else if (effectData.target === 'opponent') {
+        applyEffect(effectData, false, gameState, blackjack);
+      }
+    }
+  });
 }
 
 async function calculateRoundResult(): Promise<void> {
@@ -321,47 +298,13 @@ async function calculateRoundResult(): Promise<void> {
   }
 }
 
-// Computer AI for modifier cards
-function computerPlayModifier(): void {
-  if (gameState.computerModifierCards.length > 0 && Math.random() > 0.3) {
-    // Simple AI: 70% chance to play a random modifier, prefer armor cards when low on chips
-    let selectedCard;
-
-    if (gameState.computerChips < gameState.maxChips * 0.5) {
-      // When low on chips, prefer defensive cards
-      const defensiveCards = gameState.computerModifierCards.filter(
-        (card) =>
-          card.name.includes('Armor') ||
-          card.name.includes('Shield') ||
-          card.name.includes('Defense') ||
-          card.name.includes('Safe'),
-      );
-      selectedCard =
-        defensiveCards.length > 0
-          ? defensiveCards[Math.floor(Math.random() * defensiveCards.length)]
-          : gameState.computerModifierCards[
-              Math.floor(Math.random() * gameState.computerModifierCards.length)
-            ];
-    } else {
-      selectedCard =
-        gameState.computerModifierCards[
-          Math.floor(Math.random() * gameState.computerModifierCards.length)
-        ];
-    }
-
-    playModifierCard(selectedCard, false);
-  }
-}
-
 function resetGame(): void {
   gameState.playerChips = gameConfig.base_chips;
   gameState.playerArmor = 0;
   gameState.computerChips = gameConfig.base_chips;
   gameState.computerArmor = 0;
   gameState.playerModifierCards = [];
-  gameState.computerModifierCards = [];
   gameState.activePlayerModifiers = [];
-  gameState.activeComputerModifiers = [];
   gameState.currentPhase = 'setup';
   gameState.roundNumber = 1;
   gameState.isPlayerTurn = true;
@@ -427,7 +370,6 @@ export default {
 
   // Modifier card actions
   playModifierCard,
-  computerPlayModifier,
 
   // Enhanced blackjack actions
   blitzHit,
