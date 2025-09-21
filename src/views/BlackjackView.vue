@@ -12,6 +12,7 @@ import { useResponsiveCardSize } from '@/composables/useResponsiveCardSize';
 import useTheme from '@/composables/useTheme';
 import BlackjackSettings from './modals/BlackjackSettings.vue';
 import HitButton from '@/components/Blackjack/HitButton.vue';
+import StandButton from '@/components/Blackjack/StandButton.vue';
 
 const {
   gameState,
@@ -99,15 +100,7 @@ const { cardSize } = useResponsiveCardSize();
           }"
         >
           <HitButton @click="hit" />
-          <ActionButton
-            variant="plain"
-            class="text-base md:text-xl"
-            :class="cardBack"
-            :disabled="playerHand.length < 2"
-            @click="stand"
-          >
-            Stand
-          </ActionButton>
+          <StandButton @click="stand" />
         </div>
         <ActionButton
           v-if="(!gameState.isDealt && playerHand.length === 0) || gameState.isGameOver"

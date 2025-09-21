@@ -11,6 +11,7 @@ import SimpleModal from '@/components/Layout/SimpleModal.vue';
 import { useResponsiveCardSize } from '@/composables/useResponsiveCardSize';
 import type { ModifierCardData } from '@/assets/blackjack-blitz/modifier-cards';
 import HitButton from '@/components/Blackjack/HitButton.vue';
+import StandButton from '@/components/Blackjack/StandButton.vue';
 import useTheme from '@/composables/useTheme';
 import BlackjackSettings from './modals/BlackjackSettings.vue';
 import ModifierCard from '@/components/BlackjackBlitz/ModifierCard.vue';
@@ -210,7 +211,6 @@ const { cardSize } = useResponsiveCardSize();
     <div
       class="h-full flex-grow flex flex-col items-center justify-center gap-2 p-8 rotate-x-[30deg] w-full rounded-2xl"
       :class="tableTheme"
-      style="transform-style: preserve-3d"
     >
       <!-- Computer Hand -->
       <StandardCardHand
@@ -241,41 +241,17 @@ const { cardSize } = useResponsiveCardSize();
       />
 
       <!-- Game Actions -->
-      <div class="flex-1 flex-grow text-center absolute bottom-0 left-0 right-0 m-2">
-        <!-- Blackjack Actions -->
-        <div
-          v-if="
-            blackjackState.isDealt &&
-            gameState.currentPhase === 'blackjack' &&
-            !gameState.bustHandled
-          "
-          class="flex gap-2 justify-center"
-          :class="{
-            'pointer-events-none': blackjackState.isComputerThinking || playerHandTotal > 21,
-          }"
-        >
-          <HitButton @click="selectAction('hit')" />
-          <ActionButton
-            variant="plain"
-            class="text-base md:text-xl"
-            :class="cardBack"
-            :disabled="playerHand.length < 2 || playerHandTotal > 21"
-            @click="selectAction('stand')"
-          >
-            Stand
-          </ActionButton>
-        </div>
-
-        <!-- New Game Button -->
-        <ActionButton
-          v-if="isGameOver"
-          variant="plain"
-          class="text-base md:text-xl ml-2"
-          :class="cardBack"
-          @click="resetGame"
-        >
-          New Game
-        </ActionButton>
+      <div
+        v-if="
+          blackjackState.isDealt && gameState.currentPhase === 'blackjack' && !gameState.bustHandled
+        "
+        class="flex gap-2 justify-center flex-1 flex-grow text-center absolute bottom-0 left-0 right-0 m-2"
+        :class="{
+          'pointer-events-none': blackjackState.isComputerThinking || playerHandTotal > 21,
+        }"
+      >
+        <HitButton @click="selectAction('hit')" />
+        <StandButton @click="selectAction('stand')" />
       </div>
 
       <!-- Game Over Alerts -->
