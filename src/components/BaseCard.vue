@@ -1,16 +1,10 @@
 <script setup lang="ts" generic="T extends BaseCard">
-import { computed, ref, type StyleValue } from 'vue';
-import {
-  CARD_SIZES,
-  CARD_ANIMATIONS,
-  CARD_BACKS,
-  type CardBack,
-  type CardSize,
-} from '@/constants/cardStyles';
+import { computed, type StyleValue } from 'vue';
+import { CARD_SIZES, CARD_ANIMATIONS, type CardSize } from '@/constants/cardStyles';
 import type { BaseCard } from '@/types/cards';
+import useTheme from '@/composables/useTheme';
 
 interface Props {
-  back?: CardBack;
   isFaceUp?: boolean;
   isSelected?: boolean;
   size?: CardSize;
@@ -20,7 +14,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  back: 'red',
   isFaceUp: false,
   isSelected: false,
   size: 'md',
@@ -33,6 +26,8 @@ const emit = defineEmits<{
   click: [event: MouseEvent | undefined];
   hover: [event: MouseEvent | undefined];
 }>();
+
+const { cardBack } = useTheme;
 
 const cardClasses = computed(() => {
   const sizeConfig = CARD_SIZES[props.size];
@@ -62,9 +57,10 @@ const handleMouseEnter = (event: MouseEvent) => {
   emit('hover', event);
 };
 
-const innerCardClasses = ref(
-  'w-full h-full border border-gray-800 rounded-lg overflow-hidden absolute inset-0 transition-transform duration-400 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ' +
-    CARD_BACKS[props.back],
+const innerCardClasses = computed(
+  () =>
+    'w-full h-full border border-gray-800 rounded-lg overflow-hidden absolute inset-0 transition-transform duration-400 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ' +
+    cardBack.value,
 );
 </script>
 

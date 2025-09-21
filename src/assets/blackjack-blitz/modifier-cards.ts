@@ -1,4 +1,4 @@
-export interface ModifierCard {
+export interface ModifierCardData {
   name: string;
   rarity: 'Common' | 'Uncommon' | 'Rare' | 'Epic';
   id?: string;
@@ -59,7 +59,7 @@ export interface Effect {
 }
 
 /* Modifier cards with mapped effects */
-const ModifierCards: ModifierCard[] = [
+const ModifierCards: ModifierCardData[] = [
   {
     name: 'Safe Bet',
     rarity: 'Common',

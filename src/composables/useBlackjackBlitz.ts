@@ -2,7 +2,7 @@ import { computed, reactive } from 'vue';
 import useBlackjack from './useBlackjack';
 import modifierCardsData, {
   type EffectWhen,
-  type ModifierCard,
+  type ModifierCardData,
 } from '@/assets/blackjack-blitz/modifier-cards';
 import gameConfig from '@/assets/blackjack-blitz/game-config.json';
 import { applyEffect } from './blackjackBlitz.helpers';
@@ -13,8 +13,8 @@ export interface GameState {
   computerChips: number;
   computerArmor: number;
   maxChips: number;
-  playerModifierCards: ModifierCard[];
-  activePlayerModifiers: ModifierCard[];
+  playerModifierCards: ModifierCardData[];
+  activePlayerModifiers: ModifierCardData[];
   currentPhase: 'setup' | 'modifier-selection' | 'blackjack' | 'damage-calculation' | 'game-over';
   roundNumber: number;
   isPlayerTurn: boolean;
@@ -46,16 +46,16 @@ const gameState = reactive<GameState>({
 const blackjack = useBlackjack;
 
 // Modifier card management
-function generateModifierDeck(): ModifierCard[] {
+function generateModifierDeck(): ModifierCardData[] {
   return modifierCardsData
     .map((card, index) => ({
       ...card,
       id: `${card.name}-${index}`,
     }))
-    .filter((card) => card.isActive) as ModifierCard[];
+    .filter((card) => card.isActive) as ModifierCardData[];
 }
 
-function drawModifierCards(count: number = 3): ModifierCard[] {
+function drawModifierCards(count: number = 3): ModifierCardData[] {
   const deck = generateModifierDeck();
   const shuffled = deck.sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
@@ -126,7 +126,7 @@ function applyDamage(
 }
 
 // Modifier card effects
-function applyModifierEffect(card: ModifierCard): void {
+function applyModifierEffect(card: ModifierCardData): void {
   // Add to active modifiers
 
   gameState.activePlayerModifiers.push(card);
@@ -155,7 +155,7 @@ async function startNewRound(): Promise<void> {
   gameState.currentPhase = 'modifier-selection';
 }
 
-function playModifierCard(card: ModifierCard): void {
+function playModifierCard(card: ModifierCardData): void {
   if (!gameState.canPlayModifier) return;
 
   const cardIndex = gameState.playerModifierCards.findIndex((c) => c.id === card.id);
@@ -230,7 +230,7 @@ async function executeStand(): Promise<void> {
   await calculateRoundResult();
 }
 
-function processEffects(when: EffectWhen, card: ModifierCard, gameState: GameState): void {
+function processEffects(when: EffectWhen, card: ModifierCardData, gameState: GameState): void {
   card.effects?.forEach((effectData) => {
     if (effectData.when === when) {
       if (effectData.target === 'self') {
@@ -347,7 +347,7 @@ function initializeBlitzGame(): void {
 
 export default {
   // Game state
-  gameState: gameState,
+  gameState,
   isGameOver,
   winner,
   playerChipsPercentage,

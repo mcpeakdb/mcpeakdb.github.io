@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { type StandardCard, SUIT_COLORS } from '@/types/cards';
-import { type CardSize, type CardBack } from '@/constants/cardStyles';
+import { type CardSize } from '@/constants/cardStyles';
 import BaseCard from '../BaseCard.vue';
 import CardSuit from './CardSuit.vue';
 import CornerNumber from './CornerNumber.vue';
@@ -18,10 +18,6 @@ const props = defineProps({
   size: {
     type: String as () => CardSize,
     default: 'md',
-  },
-  cardBack: {
-    type: String as () => CardBack,
-    default: 'red',
   },
   showAnimation: {
     type: Boolean,
@@ -146,7 +142,6 @@ const handleCardClick = (card: StandardCard | undefined) => {
     :size="size"
     :show-flip-animation="showAnimation"
     :card="card"
-    :back="cardBack"
     @click="handleCardClick(card)"
   >
     <template #front>

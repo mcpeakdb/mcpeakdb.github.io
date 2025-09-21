@@ -6,11 +6,14 @@ import StandardCardHand from '@/components/StandardCard/StandardCardHand.vue';
 import ActionButton from '@/components/Layout/Buttons/ActionButton.vue';
 import TopMenu from '@/components/Layout/TopMenu.vue';
 import BaseAlert from '@/components/Layout/Alerts/BaseAlert.vue';
-import { CARD_BACKS } from '@/constants/cardStyles';
-import { TABLE_THEMES } from '@/constants/tableThemes';
+import PlayerScore from '@/components/Blackjack/PlayerScore.vue';
 import SimpleModal from '@/components/Layout/SimpleModal.vue';
 import { useResponsiveCardSize } from '@/composables/useResponsiveCardSize';
-import type { ModifierCard } from '@/assets/blackjack-blitz/modifier-cards';
+import type { ModifierCardData } from '@/assets/blackjack-blitz/modifier-cards';
+import HitButton from '@/components/Blackjack/HitButton.vue';
+import useTheme from '@/composables/useTheme';
+import BlackjackSettings from './modals/BlackjackSettings.vue';
+import ModifierCard from '@/components/BlackjackBlitz/ModifierCard.vue';
 
 const {
   gameState,
@@ -20,8 +23,6 @@ const {
   computerHand,
   computerHandTotal,
   didPlayerWin,
-  cardBack,
-  tableTheme,
   isGameOver,
   winner,
   playerChipsPercentage,
@@ -34,6 +35,8 @@ const {
   executeStand,
   startBlackjackPhase,
 } = useBlackjackBlitz;
+
+const { cardBack, tableTheme } = useTheme;
 
 onMounted(() => {
   initializeBlitzGame();
@@ -66,7 +69,7 @@ const executeAction = async (action: 'hit' | 'stand') => {
   selectedAction.value = null;
 };
 
-const playModifierAndExecute = (card: ModifierCard) => {
+const playModifierAndExecute = (card: ModifierCardData) => {
   playModifierCard(card);
   modifierModal.value?.setShow(false);
   if (selectedAction.value) {
@@ -107,85 +110,7 @@ const { cardSize } = useResponsiveCardSize();
 
       <!-- Settings Modal -->
       <SimpleModal ref="settingsModal">
-        <h2 class="text-2xl md:text-3xl font-bold mb-4">Game Settings</h2>
-        <div class="space-y-6">
-          <div class="setting-section">
-            <h5 class="text-lg md:text-xl font-semibold mb-3">Card Back Style</h5>
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                v-for="(back, name) in CARD_BACKS"
-                :key="name"
-                class="p-2 rounded-lg cursor-pointer hover:opacity-80 transition-opacity capitalize bg-gradient-to-br"
-                :class="back"
-                @click="cardBack = name"
-              >
-                {{ name }}
-              </button>
-            </div>
-          </div>
-          <div class="setting-section">
-            <h5 class="text-lg md:text-xl font-semibold mb-3">Table Theme</h5>
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                v-for="(theme, name) in TABLE_THEMES"
-                :key="name"
-                class="p-2 rounded-lg cursor-pointer hover:opacity-80 transition-opacity capitalize bg-gradient-to-br"
-                :class="theme"
-                @click="tableTheme = name"
-              >
-                {{ name }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </SimpleModal>
-
-      <!-- Modifier Card Selection Modal -->
-      <SimpleModal ref="modifierModal">
-        <h2 class="text-2xl md:text-3xl font-bold mb-4">Choose a Modifier Card</h2>
-        <p class="text-sm md:text-base mb-4 opacity-80">
-          Select a modifier card to play before your {{ selectedAction }} action, or skip to
-          continue.
-        </p>
-
-        <div class="space-y-4 mb-6">
-          <div
-            v-for="card in gameState.playerModifierCards"
-            :key="card.id"
-            class="p-4 border rounded-lg cursor-pointer hover:bg-gray-100 hover:bg-opacity-10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30"
-            :class="{
-              'border-gray-400': card.rarity === 'Common',
-              'border-green-400': card.rarity === 'Uncommon',
-              'border-blue-400': card.rarity === 'Rare',
-              'border-purple-400': card.rarity === 'Epic',
-            }"
-            @click="playModifierAndExecute(card)"
-          >
-            <div class="flex justify-between items-start mb-2">
-              <h4 class="font-semibold text-lg">{{ card.name }}</h4>
-              <span
-                class="text-xs px-2 py-1 rounded-full"
-                :class="{
-                  'bg-gray-600 text-gray-200': card.rarity === 'Common',
-                  'bg-green-600 text-green-200': card.rarity === 'Uncommon',
-                  'bg-blue-600 text-blue-200': card.rarity === 'Rare',
-                  'bg-purple-600 text-purple-200': card.rarity === 'Epic',
-                }"
-              >
-                {{ card.rarity }}
-              </span>
-            </div>
-            <p class="text-sm opacity-75">
-              {{ card.description }}
-            </p>
-          </div>
-        </div>
-
-        <div class="flex gap-2 justify-center">
-          <ActionButton variant="plain" class="text-base" @click="skipModifierAndExecute">
-            Skip Modifier
-          </ActionButton>
-        </div>
+        <BlackjackSettings />
       </SimpleModal>
     </div>
 
@@ -193,15 +118,15 @@ const { cardSize } = useResponsiveCardSize();
     <div class="w-full flex justify-between items-center py-2 px-4">
       <!-- Player Stats -->
       <div class="flex-1 max-w-xs">
-        <div class="text-sm text-white mb-1 text-right">Player</div>
+        <div class="text-sm text-white mb-1">Player</div>
         <!-- Chips Bar -->
         <div class="w-full bg-gray-700 rounded-full h-3 mb-1">
           <div
-            class="bg-green-500 h-3 rounded-full transition-all duration-500 ease-in-out"
+            class="bg-blue-500 h-3 rounded-full transition-all duration-500 ease-in-out"
             :style="{ width: `${playerChipsPercentage}%` }"
           ></div>
         </div>
-        <div class="text-xs text-white mb-2 text-right">
+        <div class="text-xs text-white mb-2">
           💎 {{ gameState.playerChips }}/{{ gameState.maxChips }}
         </div>
         <!-- Armor Display -->
@@ -221,6 +146,19 @@ const { cardSize } = useResponsiveCardSize();
         >
           🛡️ Blocked {{ gameState.lastDamageBlocked.player }} damage!
         </div>
+
+        <div class="flex-1">
+          <div class="text-xs text-gray-400 mb-1">Player Modifiers</div>
+          <div class="flex gap-1 flex-wrap justify-start">
+            <span
+              v-for="modifier in gameState.activePlayerModifiers"
+              :key="modifier.id"
+              class="text-xs px-2 py-1 bg-blue-600 bg-opacity-50 rounded-full"
+            >
+              {{ modifier.name }}
+            </span>
+          </div>
+        </div>
       </div>
 
       <!-- Round Counter -->
@@ -233,7 +171,7 @@ const { cardSize } = useResponsiveCardSize();
 
       <!-- Computer Stats -->
       <div class="flex-1 max-w-xs">
-        <div class="text-sm text-white mb-1">Dealer</div>
+        <div class="text-sm text-white mb-1 text-right">Dealer</div>
         <!-- Chips Bar -->
         <div class="w-full bg-gray-700 rounded-full h-3 mb-1">
           <div
@@ -241,7 +179,7 @@ const { cardSize } = useResponsiveCardSize();
             :style="{ width: `${computerChipsPercentage}%` }"
           ></div>
         </div>
-        <div class="text-xs text-white mb-2">
+        <div class="text-xs text-white mb-2 text-right">
           💎 {{ gameState.computerChips }}/{{ gameState.maxChips }}
         </div>
         <!-- Armor Display -->
@@ -261,40 +199,21 @@ const { cardSize } = useResponsiveCardSize();
         >
           🛡️ Blocked {{ gameState.lastDamageBlocked.computer }} damage!
         </div>
-      </div>
-    </div>
 
-    <!-- Active Modifiers Display -->
-    <div class="w-full flex justify-between px-4 py-2">
-      <!-- Player Active Modifiers -->
-      <div class="flex-1">
-        <div class="text-xs text-gray-400 mb-1">Player Modifiers</div>
-        <div class="flex gap-1 flex-wrap justify-start">
-          <span
-            v-for="modifier in gameState.activePlayerModifiers"
-            :key="modifier.id"
-            class="text-xs px-2 py-1 bg-blue-600 bg-opacity-50 rounded-full"
-          >
-            {{ modifier.name }}
-          </span>
+        <div class="flex-1">
+          <div class="text-xs text-gray-400 mb-1 text-right">Dealer Modifiers</div>
         </div>
-      </div>
-
-      <!-- Computer Active Modifiers -->
-      <div class="flex-1 text-right">
-        <div class="text-xs text-gray-400 mb-1">Dealer Modifiers</div>
       </div>
     </div>
 
     <!-- Game Table -->
     <div
       class="h-full flex-grow flex flex-col items-center justify-center gap-2 p-8 rotate-x-[30deg] w-full rounded-2xl"
-      :class="TABLE_THEMES[tableTheme]"
+      :class="tableTheme"
       style="transform-style: preserve-3d"
     >
       <!-- Computer Hand -->
       <StandardCardHand
-        :card-back="cardBack"
         :hand="computerHand"
         :visible="blackjackState.showComputerHand ? -1 : 1"
         orientation="horizontal"
@@ -305,7 +224,6 @@ const { cardSize } = useResponsiveCardSize();
 
       <!-- Player Hand -->
       <StandardCardHand
-        :card-back="cardBack"
         :hand="playerHand"
         :visible="-1"
         orientation="horizontal"
@@ -314,18 +232,13 @@ const { cardSize } = useResponsiveCardSize();
         :size="cardSize"
       />
 
-      <!-- Dealer Score -->
-      <div class="flex-1 flex-grow text-center absolute bottom-0 left-0 mx-2 tall:my-2">
-        <div class="text-sm md:text-lg uppercase tracking-wider">Dealer</div>
-        <div class="text-2xl md:text-3xl font-bold">
-          <span v-if="blackjackState.showComputerHand">{{ computerHandTotal }}</span>
-          <span v-else>??</span>
-        </div>
-        <!-- Dealer Armor Display -->
-        <div v-if="gameState.computerArmor > 0" class="text-sm text-blue-300 mt-1">
-          🛡️ {{ gameState.computerArmor }}
-        </div>
-      </div>
+      <PlayerScore :title="'Player'" :hand-total="playerHandTotal" />
+      <PlayerScore
+        :title="'Dealer'"
+        :show-total="blackjackState.showComputerHand"
+        :hand-total="computerHandTotal"
+        :right="true"
+      />
 
       <!-- Game Actions -->
       <div class="flex-1 flex-grow text-center absolute bottom-0 left-0 right-0 m-2">
@@ -341,19 +254,11 @@ const { cardSize } = useResponsiveCardSize();
             'pointer-events-none': blackjackState.isComputerThinking || playerHandTotal > 21,
           }"
         >
+          <HitButton @click="selectAction('hit')" />
           <ActionButton
             variant="plain"
             class="text-base md:text-xl"
-            :class="CARD_BACKS[cardBack]"
-            :disabled="playerHandTotal > 21"
-            @click="selectAction('hit')"
-          >
-            Hit
-          </ActionButton>
-          <ActionButton
-            variant="plain"
-            class="text-base md:text-xl"
-            :class="CARD_BACKS[cardBack]"
+            :class="cardBack"
             :disabled="playerHand.length < 2 || playerHandTotal > 21"
             @click="selectAction('stand')"
           >
@@ -366,17 +271,11 @@ const { cardSize } = useResponsiveCardSize();
           v-if="isGameOver"
           variant="plain"
           class="text-base md:text-xl ml-2"
-          :class="CARD_BACKS[cardBack]"
+          :class="cardBack"
           @click="resetGame"
         >
           New Game
         </ActionButton>
-      </div>
-
-      <!-- Player Score -->
-      <div class="flex-1 flex-grow text-center absolute bottom-0 right-0 mx-2 tall:my-2">
-        <div class="text-sm md:text-lg uppercase tracking-wider">Player</div>
-        <div class="text-2xl md:text-3xl font-bold">{{ playerHandTotal }}</div>
       </div>
 
       <!-- Game Over Alerts -->
@@ -482,40 +381,67 @@ const { cardSize } = useResponsiveCardSize();
           <div v-if="gameState.playerModifierCards.length > 0" class="col-span-2">
             <div class="text-xs text-gray-400 mb-2 text-center">Your Modifier Cards</div>
             <div class="flex gap-2 justify-center w-full overflow-visible">
-              <div
+              <ModifierCard
                 v-for="card in gameState.playerModifierCards"
                 :key="card.id"
-                class="flex flex-col justify-center p-2 border rounded-lg text-center w-32 cursor-pointer hover:bg-gray-700 hover:bg-opacity-30 transition-all duration-200 hover:-translate-y-1 relative"
-                :class="{
-                  'border-gray-500 bg-gray-800 bg-opacity-30': card.rarity === 'Common',
-                  'border-green-500 bg-green-800 bg-opacity-30': card.rarity === 'Uncommon',
-                  'border-blue-500 bg-blue-800 bg-opacity-30': card.rarity === 'Rare',
-                  'border-purple-500 bg-purple-800 bg-opacity-30': card.rarity === 'Epic',
-                }"
+                :card="card"
                 @click="gameState.canPlayModifier ? modifierModal?.setShow(true) : null"
-              >
-                <!-- Armor indicator for armor-related cards -->
-                <div
-                  v-if="card.effects?.find((effect) => effect.effect.includes('armor'))"
-                  class="absolute -top-1 -right-1 text-xs bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-blue-500/50"
-                >
-                  🛡️
-                </div>
-                <div
-                  v-else-if="card.effects?.find((effect) => effect.effect === 'damage')"
-                  class="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-red-500/50"
-                >
-                  ⚔️
-                </div>
-                <div class="text-xs font-semibold text-white">{{ card.name }}</div>
-              </div>
+              />
             </div>
+
+            <!-- Modifier Card Selection Modal -->
+            <SimpleModal ref="modifierModal">
+              <h2 class="text-2xl md:text-3xl font-bold mb-4">Choose a Modifier Card</h2>
+              <p class="text-sm md:text-base mb-4 opacity-80">
+                Select a modifier card to play before your {{ selectedAction }} action, or skip to
+                continue.
+              </p>
+
+              <div class="space-y-4 mb-6">
+                <div
+                  v-for="card in gameState.playerModifierCards"
+                  :key="card.id"
+                  class="p-4 border rounded-lg cursor-pointer hover:bg-gray-100 hover:bg-opacity-10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30"
+                  :class="{
+                    'border-gray-400': card.rarity === 'Common',
+                    'border-green-400': card.rarity === 'Uncommon',
+                    'border-blue-400': card.rarity === 'Rare',
+                    'border-purple-400': card.rarity === 'Epic',
+                  }"
+                  @click="playModifierAndExecute(card)"
+                >
+                  <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-semibold text-lg">{{ card.name }}</h4>
+                    <span
+                      class="text-xs px-2 py-1 rounded-full"
+                      :class="{
+                        'bg-gray-600 text-gray-200': card.rarity === 'Common',
+                        'bg-green-600 text-green-200': card.rarity === 'Uncommon',
+                        'bg-blue-600 text-blue-200': card.rarity === 'Rare',
+                        'bg-purple-600 text-purple-200': card.rarity === 'Epic',
+                      }"
+                    >
+                      {{ card.rarity }}
+                    </span>
+                  </div>
+                  <p class="text-sm opacity-75">
+                    {{ card.description }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex gap-2 justify-center">
+                <ActionButton variant="plain" class="text-base" @click="skipModifierAndExecute">
+                  Skip Modifier
+                </ActionButton>
+              </div>
+            </SimpleModal>
           </div>
 
           <ActionButton
             variant="plain"
             class="text-base md:text-xl"
-            :class="CARD_BACKS[cardBack]"
+            :class="cardBack"
             @click="handleDeal"
           >
             <span>Start Round</span>
