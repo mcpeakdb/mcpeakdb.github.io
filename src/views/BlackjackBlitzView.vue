@@ -471,7 +471,7 @@ const { cardSize } = useResponsiveCardSize();
 
     <div
       v-if="gameState.currentPhase === 'modifier-selection' || gameState.currentPhase === 'setup'"
-      class="absolute bottom-0 left-0 w-full"
+      class="fixed bottom-0 left-0 w-full"
     >
       <!-- Player Modifier Cards Display (Bottom) -->
       <div
