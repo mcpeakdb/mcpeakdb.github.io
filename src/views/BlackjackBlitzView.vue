@@ -76,6 +76,8 @@ const playModifierAndExecute = (card: ModifierCardData) => {
   if (selectedAction.value) {
     executeAction(selectedAction.value);
   }
+
+  handleDeal();
 };
 
 const skipModifierAndExecute = () => {
@@ -97,6 +99,12 @@ const handleDeal = () => {
 };
 
 const { cardSize } = useResponsiveCardSize();
+
+const preselectedModifier = ref<ModifierCardData | null>(null);
+const preselectModifier = (card: ModifierCardData) => {
+  preselectedModifier.value = card;
+  modifierModal.value?.setShow(true);
+};
 </script>
 
 <template>
@@ -242,9 +250,7 @@ const { cardSize } = useResponsiveCardSize();
 
       <!-- Game Actions -->
       <div
-        v-if="
-          blackjackState.isDealt && gameState.currentPhase === 'blackjack' && !gameState.bustHandled
-        "
+        v-if="blackjackState.isDealt && gameState.currentPhase === 'blackjack'"
         class="flex gap-2 justify-center flex-1 flex-grow text-center absolute bottom-0 left-0 right-0 m-2"
         :class="{
           'pointer-events-none': blackjackState.isComputerThinking || playerHandTotal > 21,
@@ -264,7 +270,8 @@ const { cardSize } = useResponsiveCardSize();
           v-if="
             blackjackState.isGameOver &&
             !isGameOver &&
-            gameState.currentPhase !== 'damage-calculation'
+            gameState.currentPhase !== 'damage-calculation' &&
+            gameState.currentPhase !== 'blackjack'
           "
         >
           <div v-if="playerHandTotal > 21" class="text-center">
@@ -351,62 +358,42 @@ const { cardSize } = useResponsiveCardSize();
       <!-- Player Modifier Cards Display (Bottom) -->
       <div
         v-if="gameState.currentPhase === 'modifier-selection'"
-        class="w-full px-4 py-2 bg-gray-900 bg-opacity-50"
+        class="w-full px-4 py-2 bg-gray-900 bg-opacity-50 overflow-hidden"
       >
         <div class="grid grid-cols-3 w-full justify-between gap-2">
-          <div v-if="gameState.playerModifierCards.length > 0" class="col-span-2">
+          <div class="col-span-2">
             <div class="text-xs text-gray-400 mb-2 text-center">Your Modifier Cards</div>
-            <div class="flex gap-2 justify-center w-full overflow-visible">
-              <ModifierCard
-                v-for="card in gameState.playerModifierCards"
-                :key="card.id"
-                :card="card"
-                @click="gameState.canPlayModifier ? modifierModal?.setShow(true) : null"
-              />
+            <div
+              v-if="gameState.playerModifierCards.length > 0"
+              class="w-full h-0 overflow-visible"
+            >
+              <div
+                class="flex justify-center gap-2 transform origin-top scale-75 pointer-events-auto"
+              >
+                <ModifierCard
+                  v-for="card in gameState.playerModifierCards"
+                  :key="card.id"
+                  :card="card"
+                  @click="preselectModifier(card)"
+                />
+              </div>
             </div>
 
             <!-- Modifier Card Selection Modal -->
             <SimpleModal ref="modifierModal">
-              <h2 class="text-2xl md:text-3xl font-bold mb-4">Choose a Modifier Card</h2>
-              <p class="text-sm md:text-base mb-4 opacity-80">
-                Select a modifier card to play before your {{ selectedAction }} action, or skip to
-                continue.
-              </p>
-
-              <div class="space-y-4 mb-6">
-                <div
-                  v-for="card in gameState.playerModifierCards"
-                  :key="card.id"
-                  class="p-4 border rounded-lg cursor-pointer hover:bg-gray-100 hover:bg-opacity-10 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30"
-                  :class="{
-                    'border-gray-400': card.rarity === 'Common',
-                    'border-green-400': card.rarity === 'Uncommon',
-                    'border-blue-400': card.rarity === 'Rare',
-                    'border-purple-400': card.rarity === 'Epic',
-                  }"
-                  @click="playModifierAndExecute(card)"
-                >
-                  <div class="flex justify-between items-start mb-2">
-                    <h4 class="font-semibold text-lg">{{ card.name }}</h4>
-                    <span
-                      class="text-xs px-2 py-1 rounded-full"
-                      :class="{
-                        'bg-gray-600 text-gray-200': card.rarity === 'Common',
-                        'bg-green-600 text-green-200': card.rarity === 'Uncommon',
-                        'bg-blue-600 text-blue-200': card.rarity === 'Rare',
-                        'bg-purple-600 text-purple-200': card.rarity === 'Epic',
-                      }"
-                    >
-                      {{ card.rarity }}
-                    </span>
-                  </div>
-                  <p class="text-sm opacity-75">
-                    {{ card.description }}
-                  </p>
-                </div>
+              <div class="flex items-center justify-center">
+                <ModifierCard v-if="preselectedModifier" :card="preselectedModifier" />
               </div>
 
               <div class="flex gap-2 justify-center">
+                <ActionButton
+                  variant="plain"
+                  class="text-base"
+                  @click="playModifierAndExecute(preselectedModifier!)"
+                >
+                  Play Modifier
+                </ActionButton>
+
                 <ActionButton variant="plain" class="text-base" @click="skipModifierAndExecute">
                   Skip Modifier
                 </ActionButton>
@@ -416,7 +403,7 @@ const { cardSize } = useResponsiveCardSize();
 
           <ActionButton
             variant="plain"
-            class="text-base md:text-xl"
+            class="text-base md:text-xl h-[20vh]"
             :class="cardBack"
             @click="handleDeal"
           >

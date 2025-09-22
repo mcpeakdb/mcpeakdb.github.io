@@ -37,7 +37,7 @@ defineExpose({ setShow });
         <!-- Modal -->
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            class="modal-content bg-white rounded-lg shadow-xl transform transition-all max-h-[90vh] overflow-y-auto"
+            class="modal-content rounded-lg shadow-xl transform transition-all max-h-[90vh] overflow-y-auto bg-white"
             @click.stop
           >
             <!-- Close button -->

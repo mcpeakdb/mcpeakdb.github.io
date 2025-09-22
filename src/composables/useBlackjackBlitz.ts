@@ -19,7 +19,6 @@ export interface GameState {
   roundNumber: number;
   isPlayerTurn: boolean;
   canPlayModifier: boolean;
-  bustHandled: boolean;
   lastDamageBlocked: { player: number; computer: number };
   lastDamageTaken: { player: number; computer: number };
 }
@@ -37,7 +36,6 @@ const gameState = reactive<GameState>({
   roundNumber: 1,
   isPlayerTurn: true,
   canPlayModifier: true,
-  bustHandled: false,
   lastDamageBlocked: { player: 0, computer: 0 },
   lastDamageTaken: { player: 0, computer: 0 },
 });
@@ -140,14 +138,12 @@ async function startNewRound(): Promise<void> {
   gameState.roundNumber++;
   gameState.isPlayerTurn = true;
   gameState.canPlayModifier = true;
-  gameState.bustHandled = false;
 
   // Clear damage blocked tracking
   gameState.lastDamageBlocked = { player: 0, computer: 0 };
 
   // Clear active modifiers from previous round
   gameState.activePlayerModifiers = [];
-  console.log(gameState.activePlayerModifiers);
 
   // Deal new modifier cards
   dealModifierCards();
@@ -168,7 +164,6 @@ function playModifierCard(card: ModifierCardData): void {
 async function startBlackjackPhase(): Promise<void> {
   gameState.currentPhase = 'blackjack';
   gameState.canPlayModifier = false;
-  gameState.bustHandled = false;
   await blackjack.dealHand();
 }
 
@@ -189,9 +184,6 @@ function executeHit(): void {
 }
 
 async function handlePlayerBust(): Promise<void> {
-  if (gameState.bustHandled) return;
-  gameState.bustHandled = true;
-
   if (gameState.activePlayerModifiers.length > 0) {
     gameState.activePlayerModifiers.forEach((card) => {
       processEffects('on_bust', card, gameState);
@@ -202,16 +194,13 @@ async function handlePlayerBust(): Promise<void> {
     });
   }
 
-  // Wait a moment for the bust to be visible
-  setTimeout(async () => {
-    // Force show computer hand and end the blackjack round
-    blackjack.gameState.value.showComputerHand = true;
-    blackjack.gameState.value.isGameOver = true;
-    blackjack.gameState.value.isDealt = false;
+  // Force show computer hand and end the blackjack round
+  blackjack.gameState.value.showComputerHand = true;
+  blackjack.gameState.value.isGameOver = true;
+  blackjack.gameState.value.isDealt = false;
 
-    // Calculate round result
-    await calculateRoundResult();
-  }, 1500);
+  // Calculate round result
+  await calculateRoundResult();
 }
 
 async function blitzStand(): Promise<void> {

@@ -6,33 +6,55 @@ defineProps({
     type: Object as () => ModifierCardData,
     required: true,
   },
+  size: {
+    type: String as () => 'sm' | 'md' | 'lg',
+    default: 'md',
+  },
 });
 </script>
 
 <template>
   <div
-    :key="card.id"
-    class="flex flex-col justify-center p-2 border rounded-lg text-center w-32 cursor-pointer hover:bg-gray-700 hover:bg-opacity-30 transition-all duration-200 hover:-translate-y-1 relative"
+    class="p-4 rounded-lg aspect-[9/16] relative inline-block border-4 shadow-lg overflow-hidden h-[70vh] max-w-[20vw] cursor-pointer"
     :class="{
-      'border-gray-500 bg-gray-800 bg-opacity-30': card.rarity === 'Common',
-      'border-green-500 bg-green-800 bg-opacity-30': card.rarity === 'Uncommon',
-      'border-blue-500 bg-blue-800 bg-opacity-30': card.rarity === 'Rare',
-      'border-purple-500 bg-purple-800 bg-opacity-30': card.rarity === 'Epic',
+      'border-gray-500 bg-gray-600 text-gray-200': card.rarity === 'Common',
+      'border-green-500 bg-green-600 text-green-200': card.rarity === 'Uncommon',
+      'border-blue-500 bg-blue-600 text-blue-200': card.rarity === 'Rare',
+      'border-purple-500 bg-purple-600 text-purple-200': card.rarity === 'Epic',
     }"
   >
-    <!-- Armor indicator for armor-related cards -->
+    <h2
+      class="font-bold mb-4"
+      :class="{
+        'text-md md:text-lg': size === 'sm',
+        'text-lg md:text-xl': size === 'md',
+        'text-xl md:text-2xl': size === 'lg',
+      }"
+    >
+      {{ card.name }}
+    </h2>
+    <p
+      class="mb-4 opacity-80 text-wrap"
+      :class="{
+        'text-xs md:text-sm': size === 'sm',
+        'text-sm md:text-base': size === 'md',
+        'text-base md:text-lg': size === 'lg',
+      }"
+    >
+      {{ card.description }}
+    </p>
+
     <div
       v-if="card.effects?.find((effect) => effect.effect.includes('armor'))"
-      class="absolute -top-1 -right-1 text-xs bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-blue-500/50"
+      class="absolute top-1 right-1 text-sm bg-blue-500 border-white border-2 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg shadow-black-500/50"
     >
       🛡️
     </div>
     <div
       v-else-if="card.effects?.find((effect) => effect.effect === 'damage')"
-      class="absolute -top-1 -right-1 text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-red-500/50"
+      class="absolute top-1 right-1 text-sm bg-red-500 border-white border-2 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg shadow-black-500/50"
     >
       ⚔️
     </div>
-    <div class="text-xs font-semibold text-white">{{ card.name }}</div>
   </div>
 </template>
