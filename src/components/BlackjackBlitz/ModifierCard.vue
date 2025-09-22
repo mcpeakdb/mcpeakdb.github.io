@@ -15,7 +15,7 @@ defineProps({
 
 <template>
   <div
-    class="p-4 rounded-lg aspect-[9/16] relative inline-block border-4 shadow-lg overflow-hidden h-[70vh] max-w-[20vw] cursor-pointer"
+    class="p-4 rounded-lg aspect-[9/16] relative inline-block border-4 shadow-lg overflow-hidden h-[70vh] cursor-pointer"
     :class="{
       'border-gray-500 bg-gray-600 text-gray-200': card.rarity === 'Common',
       'border-green-500 bg-green-600 text-green-200': card.rarity === 'Uncommon',
