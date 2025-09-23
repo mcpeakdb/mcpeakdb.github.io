@@ -215,9 +215,71 @@ const preselectModifier = (card: ModifierCardData) => {
       </div>
     </div>
 
+    <div
+      v-if="gameState.currentPhase === 'modifier-selection'"
+      class="flex-grow flex flex-col items-center"
+    >
+      <!-- Player Modifier Cards Display (Bottom) -->
+      <div class="w-full px-4 py-2 bg-gray-900 bg-opacity-50 overflow-hidden">
+        <div class="w-full">
+          <div class="text-xs text-gray-400 mb-2 text-center">Your Modifier Cards</div>
+          <div v-if="gameState.playerModifierCards.length > 0">
+            <div class="flex gap-2 overflow-auto">
+              <ModifierCard
+                v-for="card in gameState.playerModifierCards"
+                :key="card.id"
+                :card="card"
+                @click="preselectModifier(card)"
+              />
+            </div>
+          </div>
+
+          <!-- Modifier Card Selection Modal -->
+          <SimpleModal ref="modifierModal">
+            <div class="flex items-center justify-center">
+              <ModifierCard v-if="preselectedModifier" :card="preselectedModifier" />
+            </div>
+
+            <div class="flex gap-2 justify-center">
+              <ActionButton
+                variant="plain"
+                class="text-base"
+                @click="playModifierAndExecute(preselectedModifier!)"
+              >
+                Play Modifier
+              </ActionButton>
+
+              <ActionButton variant="plain" class="text-base" @click="skipModifierAndExecute">
+                Skip Modifier
+              </ActionButton>
+            </div>
+          </SimpleModal>
+        </div>
+
+        <ActionButton
+          variant="plain"
+          class="text-base md:text-xl w-full mt-2"
+          :class="cardBack"
+          @click="handleDeal"
+        >
+          <span>Start Round</span>
+        </ActionButton>
+      </div>
+
+      <!-- Game Instructions (Show during setup) -->
+      <div class="w-full px-4 py-2 bg-blue-900 bg-opacity-30 text-center">
+        <div class="text-sm text-blue-200">
+          <span>
+            🃏 Round {{ gameState.roundNumber }} - Choose a modifier or click "Start Round" to
+            begin!
+          </span>
+        </div>
+      </div>
+    </div>
     <!-- Game Table -->
     <div
-      class="h-full flex-grow flex flex-col items-center justify-center gap-2 p-8 rotate-x-[30deg] w-full rounded-2xl"
+      v-else
+      class="flex-grow flex flex-col items-center justify-center gap-2 p-8 rotate-x-[30deg] w-full rounded-2xl"
       :class="tableTheme"
     >
       <!-- Computer Hand -->
@@ -263,17 +325,10 @@ const preselectModifier = (card: ModifierCardData) => {
       <!-- Game Over Alerts -->
       <div
         v-if="blackjackState.isGameOver || isGameOver"
-        class="absolute inset-0 flex items-center justify-center pointer-events-none"
+        class="absolute inset-0 flex flex-col items-center justify-center"
       >
         <!-- Round Result - Only show if not in damage calculation and game isn't over -->
-        <BaseAlert
-          v-if="
-            blackjackState.isGameOver &&
-            !isGameOver &&
-            gameState.currentPhase !== 'damage-calculation' &&
-            gameState.currentPhase !== 'blackjack'
-          "
-        >
+        <BaseAlert v-if="blackjackState.isGameOver && !isGameOver">
           <div v-if="playerHandTotal > 21" class="text-center">
             💥 BUST! 💥
             <div class="text-sm mt-1">You went over 21!</div>
@@ -310,6 +365,15 @@ const preselectModifier = (card: ModifierCardData) => {
           </div>
         </BaseAlert>
 
+        <ActionButton
+          v-if="blackjackState.isGameOver && !isGameOver"
+          variant="plain"
+          class="text-base mt-2"
+          :class="cardBack"
+          @click="startNewRound"
+          >Start New Round</ActionButton
+        >
+
         <!-- Final Game Result - Only show when the entire game is over -->
         <BaseAlert v-if="isGameOver" variant="success">
           <div v-if="winner === 'player'" class="text-center">
@@ -321,111 +385,6 @@ const preselectModifier = (card: ModifierCardData) => {
             <div class="text-sm mt-1">The dealer has won!</div>
           </div>
         </BaseAlert>
-      </div>
-
-      <!-- Damage Calculation Phase -->
-      <div
-        v-if="gameState.currentPhase === 'damage-calculation'"
-        class="absolute inset-0 flex items-center justify-center pointer-events-none"
-      >
-        <BaseAlert variant="info">
-          <div class="text-center">
-            ⚔️ CALCULATING DAMAGE ⚔️
-            <div class="text-sm mt-1">Applying round results...</div>
-            <!-- Show armor effects during calculation -->
-            <div
-              v-if="
-                gameState.lastDamageBlocked.player > 0 || gameState.lastDamageBlocked.computer > 0
-              "
-              class="text-xs text-blue-300 mt-2"
-            >
-              <div v-if="gameState.lastDamageBlocked.player > 0">
-                🛡️ Player armor blocked {{ gameState.lastDamageBlocked.player }} damage
-              </div>
-              <div v-if="gameState.lastDamageBlocked.computer > 0">
-                🛡️ Dealer armor blocked {{ gameState.lastDamageBlocked.computer }} damage
-              </div>
-            </div>
-          </div>
-        </BaseAlert>
-      </div>
-    </div>
-
-    <div
-      v-if="gameState.currentPhase === 'modifier-selection' || gameState.currentPhase === 'setup'"
-      class="fixed bottom-0 left-0 w-full"
-    >
-      <!-- Player Modifier Cards Display (Bottom) -->
-      <div
-        v-if="gameState.currentPhase === 'modifier-selection'"
-        class="w-full px-4 py-2 bg-gray-900 bg-opacity-50 overflow-hidden"
-      >
-        <div class="grid grid-cols-3 w-full justify-between gap-2">
-          <div class="col-span-2">
-            <div class="text-xs text-gray-400 mb-2 text-center">Your Modifier Cards</div>
-            <div
-              v-if="gameState.playerModifierCards.length > 0"
-              class="w-full h-0 overflow-visible"
-            >
-              <div
-                class="flex justify-center gap-2 transform origin-top scale-75 pointer-events-auto"
-              >
-                <ModifierCard
-                  v-for="card in gameState.playerModifierCards"
-                  :key="card.id"
-                  :card="card"
-                  @click="preselectModifier(card)"
-                />
-              </div>
-            </div>
-
-            <!-- Modifier Card Selection Modal -->
-            <SimpleModal ref="modifierModal">
-              <div class="flex items-center justify-center">
-                <ModifierCard v-if="preselectedModifier" :card="preselectedModifier" />
-              </div>
-
-              <div class="flex gap-2 justify-center">
-                <ActionButton
-                  variant="plain"
-                  class="text-base"
-                  @click="playModifierAndExecute(preselectedModifier!)"
-                >
-                  Play Modifier
-                </ActionButton>
-
-                <ActionButton variant="plain" class="text-base" @click="skipModifierAndExecute">
-                  Skip Modifier
-                </ActionButton>
-              </div>
-            </SimpleModal>
-          </div>
-
-          <ActionButton
-            variant="plain"
-            class="text-base md:text-xl h-[20vh]"
-            :class="cardBack"
-            @click="handleDeal"
-          >
-            <span>Start Round</span>
-          </ActionButton>
-        </div>
-      </div>
-
-      <!-- Game Instructions (Show during setup) -->
-      <div
-        v-if="gameState.currentPhase === 'setup' || gameState.currentPhase === 'modifier-selection'"
-        class="w-full px-4 py-2 bg-blue-900 bg-opacity-30 text-center"
-      >
-        <div class="text-sm text-blue-200">
-          <span v-if="gameState.currentPhase === 'setup'">
-            🎮 Welcome to Blackjack Blitz! Battle the dealer with modifier cards, chips, and armor
-            protection.
-          </span>
-          <span v-else-if="gameState.currentPhase === 'modifier-selection'">
-            🃏 Round {{ gameState.roundNumber }} - Click "Start Round" to begin!
-          </span>
-        </div>
       </div>
     </div>
   </main>

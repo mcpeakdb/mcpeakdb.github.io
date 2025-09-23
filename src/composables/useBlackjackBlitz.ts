@@ -134,13 +134,13 @@ function applyModifierEffect(card: ModifierCardData): void {
 }
 
 async function startNewRound(): Promise<void> {
-  gameState.currentPhase = 'setup';
   gameState.roundNumber++;
   gameState.isPlayerTurn = true;
   gameState.canPlayModifier = true;
 
   // Clear damage blocked tracking
   gameState.lastDamageBlocked = { player: 0, computer: 0 };
+  gameState.lastDamageTaken = { player: 0, computer: 0 };
 
   // Clear active modifiers from previous round
   gameState.activePlayerModifiers = [];
@@ -232,8 +232,6 @@ function processEffects(when: EffectWhen, card: ModifierCardData, gameState: Gam
 }
 
 async function calculateRoundResult(): Promise<void> {
-  gameState.currentPhase = 'damage-calculation';
-
   const playerTotal = blackjack.playerHandTotal.value;
   const computerTotal = blackjack.computerHandTotal.value;
   const playerBust = playerTotal > 21;
@@ -278,12 +276,13 @@ async function calculateRoundResult(): Promise<void> {
   if (gameState.playerChips <= 0 || gameState.computerChips <= 0) {
     gameState.currentPhase = 'game-over';
   } else {
-    // Prepare for next round with a longer delay to show results
-    setTimeout(() => {
-      if (gameState.currentPhase === 'damage-calculation') {
-        startNewRound();
-      }
-    }, 3000); // Increased delay to 3 seconds
+    gameState.currentPhase = 'setup';
+    // // Prepare for next round with a longer delay to show results
+    // setTimeout(() => {
+    //   if (gameState.currentPhase === 'damage-calculation') {
+    //     startNewRound();
+    //   }
+    // }, 3000); // Increased delay to 3 seconds
   }
 }
 
